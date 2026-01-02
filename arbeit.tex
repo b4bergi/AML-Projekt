@@ -1,0 +1,308 @@
+\documentclass[a4paper, 11pt]{article}          % Paper and font size
+\usepackage[ngerman]{babel}                     % Language setting
+
+% Set margins
+\usepackage[top=2.5cm,bottom=2.5cm,left=2cm,right=2cm,marginparwidth=1.75cm]{geometry}
+
+% Load useful packages
+
+\usepackage{graphicx}                           % Graphics
+\usepackage{amsmath}                            % Math
+\usepackage{xcolor}                             % Link color
+\definecolor{custom-blue}{RGB}{0,99,166} 
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, allcolors=custom-blue}
+\usepackage[default]{sourcesanspro}             % Load font
+\usepackage[T1]{fontenc}                        % Special characters
+\usepackage{fancyhdr}                           % Load header, footer package
+\usepackage{listings}                           % Code Snippets
+\usepackage{lastpage}                           % Footer note
+\usepackage{lipsum}                             % For dummy text
+\usepackage{tabularx}
+
+\pagestyle{myheadings}                          % Own header
+\pagestyle{fancy}                               % Own style
+\fancyhf{}                                      % Clear header, footer
+
+\setlength{\headheight}{30pt}                   % Set header hight
+\renewcommand{\headrulewidth}{0.5pt}            % Top line
+\renewcommand{\footrulewidth}{0.5pt}            % Bottom line
+
+\fancyhead[L]{\includegraphics[width=3cm]{univienna-logo.eps}} % Header left
+\fancyhead[C]{}                                 % Header center
+\fancyhead[R]{University of Vienna}             % Header right
+\fancyfoot[L]{\textcopyright Krystian Gluk, Christian, Dominik Berghammerer, Adrian Linder}         % Footer left
+\fancyfoot[C]{}                                 % Footer center
+\fancyfoot[R]{\thepage/\pageref{LastPage}}      % Footer right
+
+% -- Defining colors:
+\usepackage[dvipsnames]{xcolor}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+% Definig a custom style:
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codepurple},
+    keywordstyle=\color{NavyBlue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize\bfseries,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=t,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+
+
+\colorlet{punct}{red!60!black}
+\definecolor{background}{HTML}{EEEEEE}
+\definecolor{delim}{RGB}{20,105,176}
+\colorlet{numb}{magenta!60!black}
+\lstdefinelanguage{json}{
+    basicstyle=\normalfont\ttfamily,
+    numbers=left,
+    numberstyle=\scriptsize,
+    stepnumber=1,
+    numbersep=8pt,
+    showstringspaces=false,
+    breaklines=true,
+    frame=lines,
+    backgroundcolor=\color{background},
+    literate=
+     *{0}{{{\color{numb}0}}}{1}
+      {1}{{{\color{numb}1}}}{1}
+      {2}{{{\color{numb}2}}}{1}
+      {3}{{{\color{numb}3}}}{1}
+      {4}{{{\color{numb}4}}}{1}
+      {5}{{{\color{numb}5}}}{1}
+      {6}{{{\color{numb}6}}}{1}
+      {7}{{{\color{numb}7}}}{1}
+      {8}{{{\color{numb}8}}}{1}
+      {9}{{{\color{numb}9}}}{1}
+      {:}{{{\color{punct}{:}}}}{1}
+      {,}{{{\color{punct}{,}}}}{1}
+      {\{}{{{\color{delim}{\{}}}}{1}
+      {\}}{{{\color{delim}{\}}}}}{1}
+      {[}{{{\color{delim}{[}}}}{1}
+      {]}{{{\color{delim}{]}}}}{1},
+}
+
+% -- Setting up the custom style:
+\lstset{style=mystyle}
+
+%%% Begin document %%%
+\begin{document}
+
+\begin{figure}                                  % Include Logo
+\flushleft
+\includegraphics[width=0.4\textwidth]{univienna-logo.eps}
+\end{figure}
+
+% Set title, author, date
+\title{Abschlussprojekt Angewantes Machinelles Lernen}
+\author{Krystian Gluk - 12230903\\
+        Christian - 12312344\\
+        Dominik Berghammerer - \\
+        Adrian Linder - 12243106}
+\date{\today{}, Vienna}
+
+\maketitle                                      % Include contents
+\tableofcontents
+
+%Teil 2
+\newpage
+\section{Finetune Beispiel mit BERT}
+Im folgenden Kapitel werden wir uns nun mit einem Anwendungbeispiel beschäftigen welches ein BERT Model nutzt um Informationen für Nutzer bereitzustellen.
+\medskip \\
+Wir wollen nun BERT nutzen um einem Benutzer die Möglichkeit zu geben durch Natürliche Fragen informationen über eine Fiktive Firma zu erhalten. Daher betrachten wir nun einmal unser Trainingsset
+
+\subsection{Dataset}
+Wir betrachten die Fiktive Firma \emph{Example Tech} mit Standorten in Berlin, München und Hamburg. Wir haben nun eine Liste von Mitarbeitern welche in bestimmten Positionen an bestimmten Orten arbeiten 
+\begin{lstlisting}[language = json]
+    { 
+        "name": "Alice", 
+        "role": "CEO", 
+        "location": "Berlin", 
+        "email": "ceo@exampletech.com" 
+    },
+    { 
+        "name": "Carol", 
+        "role": "CFO", 
+        "location": "Munich", 
+        "email": "cfo@exampletech.com" 
+    },
+    { 
+        "name": "Lily", 
+        "role": "Accountant", 
+        "location": "Hamburg", 
+        "email": "accounting.hamburg@exampletech.com" 
+    },
+    ....
+\end{lstlisting}
+Insgesammt gibt es 24 Personen mit verschiedenen Jobs, Namen und Arbeitsorten. Weiters bietet das Unternehmen noch verschiedene Produkte an 
+\begin{lstlisting}[language = json]
+
+    { 
+        "name": "AlphaPhone", 
+        "category": "Electronics", 
+        "price": 699 
+    },
+    { 
+        "name": "OrionERP", 
+        "category": "Software", 
+        "price": 99 
+    },
+    { 
+        "name": "LightPanel", 
+        "category": "Furniture", 
+        "price": 149 
+    },
+    { 
+        "name": "TechSupport+", 
+        "category": "Service", 
+        "price": 39 
+    },
+    ....
+\end{lstlisting}
+Es gibt gesammt 19 Produkte.
+\medskip \\
+Nun können wir uns Fragen wie wir dieses Datenset in eine Form überführen mit welcher wir BERT trainieren können. Die Idee war nun dies mittels Natürlicher Fragen über das Datenset zu machen. Wir Trainieren also auf Text wie 
+\begin{center}
+    \emph{Alice is the CEO working in the Berlin Office}
+\end{center}
+oder 
+\begin{center}
+    \emph{Alice's email address is ceo@exampletech.com}
+\end{center}
+und auch Fragen wie 
+\begin{center}
+    \emph{Where is Alice? In the Berlin Office.}
+\end{center}
+\medskip
+Selbes machen wir für die Produkte. Würden wir nun diese Fragen einfach dem Tokonizer geben hätten wir jedoch ein Problem. Denn z.B. CEO ist \emph{Ein} Token jedoch z.B. Sales Manager \emph{zwei} Token und eine EMail addresse wird sogar in bis zu \emph{fünf} Token aufgespaltet. Daher unsere Lösung, wir fügen einfach einige neue Token hinzu. Dies lässt sich mittels Transformerers sehr einfach machen.
+\begin{lstlisting}[language = python]
+
+emails = [
+    e["email"] for e in json.load(open("dataset.json"))["employees"]
+]
+
+jobs = [
+    e["role"] for e in json.load(open("dataset.json"))["employees"]
+]
+
+
+products = [
+    e["name"] for e in json.load(open("dataset.json"))["products"]
+]
+
+
+prices = [
+    str(e["price"]) for e in json.load(open("dataset.json"))["products"]
+]
+
+companyName = [json.load(open("dataset.json"))["company"]["name"]
+]
+
+tokenizer.add_tokens(emails)
+tokenizer.add_tokens(jobs)
+tokenizer.add_tokens(products)
+tokenizer.add_tokens(prices)
+tokenizer.add_tokens(companyName)
+
+# WICHTIG Model auf neues Vokabular anpassen
+model.resize_token_embeddings(len(tokenizer))
+\end{lstlisting}
+
+\subsection{Training}
+Das Training wird lokal mittels PyTorch und Transformerers durchgeführt. Der genutzte PC hat die folgenden Spezifikationen
+\begin{center}
+    \begin{tabular}{|c|c|}
+        \hline
+        CPU & AMD Ryzen 7 7700X \\
+        \hline
+        GPU & NVIDIA GeForce RTX 3060 12GB \\
+        \hline
+        RAM & 32 GB - DDR5 4800 MT/s \\
+        \hline
+        Betriebsystem & Arch Linux - 6.18.2 \\ 
+        \hline
+        CUDA & 12.6\\
+        \hline
+    \end{tabular}
+\end{center}
+Die Transformerers Bibliothek hat glücklicherweise bereits eine Implementation für BERT somit können wir diese einfach nutzen. Zunächst importieren wir den Tokonizer und das Model sowie den Trainer. 
+\begin{lstlisting}[language = python]
+import torch
+from transformers import (
+    BertTokenizer,
+    BertForMaskedLM,
+    DataCollatorForLanguageModeling,
+    Trainer,
+    TrainingArguments,
+    EarlyStoppingCallback)
+\end{lstlisting}
+damit ist schon fast die Hälfte des Coding aufwands geschafft. 
+\medskip\\
+Unsere Nächste überlegung ist nun welches Model wir nutzen wollen zum Trainieren. Unsere Wahl fiel auf \emph{bert-base-uncased}. Dieses ist ein Basis BERT Model welche nicht zwischen Groß- und Kleinschreibung unterscheidet. Wie bereits vorher Diskutiert wurden dem Tokonizer die EMail-Adressen, Jobs und Produkte als Token hinzugefügt damit wir uns nicht über die genaue Anzahl an Mask gedanken machen müssen. Um nun das Model und den Tokonizer zu laden können wir einfach Transformerers nutzen 
+\begin{lstlisting}[language = python]
+model = BertForMaskedLM.from_pretrained("bert-base-uncased")
+tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
+\end{lstlisting}
+Transformerers wird uns nun automatisch das Model herunterladen und lokal speichern. Dies kann beim ersten Start zu einiger Wartezeit führen je nach Internetvertrag.
+\medskip\\
+Wir wollen nun den Trainer vorbereiten. Hirzu nutzen wir die \emph{TrainingArguments}. Wir nutzen hierbei die folgenden Argumente: 
+\begin{center}
+    \begin{tabularx}{\textwidth}{|c|c|X|}
+        \hline
+        \textbf{Argument} & \textbf{Wert} & \textbf{Beschreibung} \\
+        \hline
+        \verb|num_train_epochs| & 500 & Anzahl der Epochen (wie oft durch das gesammte Trainingsset durchgegangen wird) \\
+        \hline
+        \verb|per_device_train_batch_size| & 16 & Die Batch Größe \\
+        \hline
+        \verb|learning_rate| & 5e-5($10^{-5}$) & Lernrate \\
+        \hline
+        \verb|save_steps| & 3000 & Wie oft er einen zwischenstand Speichert \\
+        \hline
+        \verb|save_total_limit| & 2 & Wie viele zwischenstände er behält \\
+        \hline
+        \verb|logging_steps| & 100 & Wie oft der Loss berechnet und ausgegeben wird \\
+        \hline
+        \verb|lr_scheduler_type| & linear & Wie die Lernrate verändert wird \\
+        \hline
+        \verb|warmup_ratio| & 0.1 & \\
+        \hline
+    \end{tabularx}
+\end{center}
+Nun können wir also mit diesen Argumenten einen Trainer erstellen.
+\begin{lstlisting}[language = python]
+training_args = TrainingArguments(
+    #Arguments
+)
+
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    train_dataset=dataset,
+    data_collator=data_collator,
+)
+\end{lstlisting}
+Nun sind wir endlich bereit den Trainer zu starten. Dies ist simple und einfach. Anschließend können wir das Model noch speichern damit wir es später verwenden können. 
+\begin{lstlisting}[language = python]
+trainer.train()
+
+model.save_pretrained("./bert-company")
+tokenizer.save_pretrained("./bert-company")
+\end{lstlisting}
+
+
+\end{document}

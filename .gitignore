@@ -1,0 +1,8 @@
+**/*.toc
+**/*.log
+**/*.fls
+**/*.out
+**/*.aux
+**/*.fdb_latexmk
+**/*.synctex.gz
+univienna-logo-eps-converted-to.pdf
