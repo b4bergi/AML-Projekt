@@ -118,6 +118,80 @@
 \maketitle                                      % Include contents
 \tableofcontents
 
+
+\newpage
+\section{Thema}
+Nach unserem ersten Versuch allgemeiner angelegte Methoden zur Textgenerierung zu bewerten und von Scratch zu trainieren, haben wir uns auf eine spezifischere Aufgabe fokussiert: Masked-Language-Models und Lückentexte.
+Zu diesen Thema wurden dann 3 Verschiedene Aufgaben spezifiziert
+\begin{enumerate}
+    \item Das Ausfüllen von Lückentexten
+    \item Das Finetuenen von MLMs
+    \item Das Korrigieren von Lückentexten
+\end{enumerate}
+
+\section{Technologien}
+Nach einer Recherche zu diesem Thema, stößt man schnell auf den Begriff Masked-Language-Models.
+Eines der bekanntesten Models dazu ist BERT (Bidirectional Encoder Representations from Transformers). Es gibt zahlreiche andere Modelle, die für Lückentexte verwendet werden können, wie zum Beispiel BART, RoBERTa, ALBERT, ELECTRA, MPNet wobei hinter vielen von diesen Modellen die BERT Architektur steckt.\\
+Gegeben einen maskierten Text, geben solchen Modelle das Wort zurück, dass sich am wahrscheinlichsten hinter der Maske versteckt.
+Bei dem Satz "[MASK] is the capital of France." würde so ein Modell zum Beispiel das Wort "Paris" vorhersagen.
+
+\newpage
+\section{Das Ausfüllen von Lückentexten}
+\subsection{Einfaches ausfüllen mithilfe von BERT}
+Eine der einfachsten Möglichkeiten, einen Lückentext automatisch auszufüllen, ist die Verwendung von BERT über die \textit{transformers}-Bibliothek.
+\begin{lstlisting}[language = python]
+from transformers import pipeline
+
+pipeline_bert = pipeline(
+    task="fill-mask",
+    model="bert-base-uncased",
+    device=0 # benutzt GPU statt CPU
+)
+pipeline_bert(
+"Plants create [MASK] through a process [MASK] as photosynthesis.",
+top_k=2 # gibt die Top 2 Resulate zurück
+)
+)
+\end{lstlisting}
+
+\medskip \\
+Nachdem man diesen Code ausführt erhält man folgendes Resultat.
+\medskip \\
+
+\begin{lstlisting}[language = json]
+    [
+    [{'score': 0.2662782669067383,
+   'token': 2943,
+   'token_str': 'energy',
+   'sequence': '[CLS] plants create energy through a process [MASK] as photosynthesis. [SEP]'},
+  {'score': 0.10305079817771912,
+   'token': 4870,
+   'token_str': 'flowers',
+   'sequence': '[CLS] plants create flowers through a process [MASK] as photosynthesis. [SEP]'}],
+   
+ [{'score': 0.9980964064598083,
+   'token': 2124,
+   'token_str': 'known',
+   'sequence': '[CLS] plants create [MASK] through a process known as photosynthesis. [SEP]'},
+  {'score': 0.001142986468039453,
+   'token': 2107,
+   'token_str': 'such',
+   'sequence': '[CLS] plants create [MASK] through a process such as photosynthesis. [SEP]'}]
+   ]
+\end{lstlisting}
+\medskip \\
+Da der Lückentext zwei Lücken enthält, bekommt man eine Liste mit zwei Listen zurück. Diese sind jeweils die Resultate zur ersten und zur zweiten Lücke.\\
+Anhand des Scores sieht man klar, dass sich das Modell bei der zweiten Lücke deutlich sicherer fühlt als bei der ersten Lücke.\\
+Das Modell schlägt uns also den folgenden ausgefüllten Lückentext vor:\\
+\textit{Plants create \textbf{energy} through a process \textbf{known} as photosynthesis.}
+
+\newpage
+\subsection{Verschiedene Modelle für Verschiedene Themengebiete}
+
+
+
+
+
 %Teil 2
 \newpage
 \section{Finetune Beispiel mit BERT}
