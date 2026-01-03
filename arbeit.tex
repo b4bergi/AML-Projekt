@@ -31,7 +31,7 @@
 \fancyhead[L]{\includegraphics[width=3cm]{univienna-logo.eps}} % Header left
 \fancyhead[C]{}                                 % Header center
 \fancyhead[R]{University of Vienna}             % Header right
-\fancyfoot[L]{\textcopyright Krystian Gluk, Christian, Dominik Berghammerer, Adrian Linder}         % Footer left
+\fancyfoot[L]{\textcopyright Krystian Gluc, Cristian Grigore, Dominik Berghammer, Adrian Linder}         % Footer left
 \fancyfoot[C]{}                                 % Footer center
 \fancyfoot[R]{\thepage/\pageref{LastPage}}      % Footer right
 
@@ -109,9 +109,9 @@
 
 % Set title, author, date
 \title{Abschlussprojekt Angewantes Machinelles Lernen}
-\author{Krystian Gluk - 12230903\\
-        Christian - 12312344\\
-        Dominik Berghammerer - \\
+\author{Krystian Gluc - 12230903\\
+        Cristian Grigore - 12312344\\
+        Dominik Berghammer - 12316294\\
         Adrian Linder - 12243106}
 \date{\today{}, Vienna}
 
@@ -148,7 +148,7 @@ Wir betrachten die Fiktive Firma \emph{Example Tech} mit Standorten in Berlin, M
     },
     ....
 \end{lstlisting}
-Insgesammt gibt es 24 Personen mit verschiedenen Jobs, Namen und Arbeitsorten. Weiters bietet das Unternehmen noch verschiedene Produkte an 
+Insgesamt gibt es 24 Personen mit verschiedenen Jobs, Namen und Arbeitsorten. Weiters bietet das Unternehmen noch verschiedene Produkte an 
 \begin{lstlisting}[language = json]
 
     { 
@@ -173,9 +173,9 @@ Insgesammt gibt es 24 Personen mit verschiedenen Jobs, Namen und Arbeitsorten. W
     },
     ....
 \end{lstlisting}
-Es gibt gesammt 19 Produkte.
+Es gibt gesamt 19 Produkte.
 \medskip \\
-Nun können wir uns Fragen wie wir dieses Datenset in eine Form überführen mit welcher wir BERT trainieren können. Die Idee war nun dies mittels Natürlicher Fragen über das Datenset zu machen. Wir Trainieren also auf Text wie 
+Nun können wir uns Fragen wie wir dieses Datenset in eine Form überführen mit welcher wir BERT trainieren können. Die Idee war nun dies mittels Natürlicher Fragen über das Datenset zu machen. Wir trainieren also auf Text wie 
 \begin{center}
     \emph{Alice is the CEO working in the Berlin Office}
 \end{center}
@@ -188,7 +188,7 @@ und auch Fragen wie
     \emph{Where is Alice? In the Berlin Office.}
 \end{center}
 \medskip
-Selbes machen wir für die Produkte. Würden wir nun diese Fragen einfach dem Tokonizer geben hätten wir jedoch ein Problem. Denn z.B. CEO ist \emph{Ein} Token jedoch z.B. Sales Manager \emph{zwei} Token und eine EMail addresse wird sogar in bis zu \emph{fünf} Token aufgespaltet. Daher unsere Lösung, wir fügen einfach einige neue Token hinzu. Dies lässt sich mittels Transformerers sehr einfach machen.
+Selbes machen wir für die Produkte. Würden wir nun diese Fragen einfach dem Tokenizer geben hätten wir jedoch ein Problem. Denn z.B. CEO ist \emph{Ein} Token jedoch z.B. Sales Manager \emph{zwei} Token und eine EMail addresse wird sogar in bis zu \emph{fünf} Token aufgespaltet. Daher unsere Lösung, wir fügen einfach einige neue Token hinzu. Dies lässt sich mittels Transformerers sehr einfach machen.
 \begin{lstlisting}[language = python]
 
 emails = [
@@ -239,7 +239,7 @@ Das Training wird lokal mittels PyTorch und Transformerers durchgeführt. Der ge
         \hline
     \end{tabular}
 \end{center}
-Die Transformerers Bibliothek hat glücklicherweise bereits eine Implementation für BERT somit können wir diese einfach nutzen. Zunächst importieren wir den Tokonizer und das Model sowie den Trainer. 
+Die Transformerers Bibliothek hat glücklicherweise bereits eine Implementation für BERT somit können wir diese einfach nutzen. Zunächst importieren wir den Tokenizer und das Model sowie den Trainer. 
 \begin{lstlisting}[language = python]
 import torch
 from transformers import (
@@ -252,7 +252,7 @@ from transformers import (
 \end{lstlisting}
 damit ist schon fast die Hälfte des Coding aufwands geschafft. 
 \medskip\\
-Unsere Nächste überlegung ist nun welches Model wir nutzen wollen zum Trainieren. Unsere Wahl fiel auf \emph{bert-base-uncased}. Dieses ist ein Basis BERT Model welche nicht zwischen Groß- und Kleinschreibung unterscheidet. Wie bereits vorher Diskutiert wurden dem Tokonizer die EMail-Adressen, Jobs und Produkte als Token hinzugefügt damit wir uns nicht über die genaue Anzahl an Mask gedanken machen müssen. Um nun das Model und den Tokonizer zu laden können wir einfach Transformerers nutzen 
+Unsere Nächste überlegung ist nun welches Model wir nutzen wollen zum Trainieren. Unsere Wahl fiel auf \emph{bert-base-uncased}. Dieses ist ein Basis BERT Model welche nicht zwischen Groß- und Kleinschreibung unterscheidet. Wie bereits vorher Diskutiert wurden dem Tokenizer die EMail-Adressen, Jobs und Produkte als Token hinzugefügt damit wir uns nicht über die genaue Anzahl an Mask gedanken machen müssen. Um nun das Model und den Tokenizer zu laden können wir einfach Transformerers nutzen 
 \begin{lstlisting}[language = python]
 model = BertForMaskedLM.from_pretrained("bert-base-uncased")
 tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
@@ -265,7 +265,7 @@ Wir wollen nun den Trainer vorbereiten. Hirzu nutzen wir die \emph{TrainingArgum
         \hline
         \textbf{Argument} & \textbf{Wert} & \textbf{Beschreibung} \\
         \hline
-        \verb|num_train_epochs| & 500 & Anzahl der Epochen (wie oft durch das gesammte Trainingsset durchgegangen wird) \\
+        \verb|num_train_epochs| & 500 & Anzahl der Epochen (wie oft durch das gesamte Trainingsset durchgegangen wird) \\
         \hline
         \verb|per_device_train_batch_size| & 16 & Die Batch Größe \\
         \hline
@@ -304,5 +304,191 @@ model.save_pretrained("./bert-company")
 tokenizer.save_pretrained("./bert-company")
 \end{lstlisting}
 
+%==========================
+%Teil 3 
+%==========================
+
+\section{Korrektur von Lückentexten}
+In diesem Teil wollten wir einem Modell einen ausgefüllten Lückentext geben, damit es ihn korrigiert: Wurde der Text richtig oder falsch ausgefüllt?
+\subsection{Datenset für Korrektur}
+Zunächst wurde hier ein öffentliches Datenset "Cloze-test-with-Bert"\footnote{\label{foot:1}https://github.com/TheMaxi7/Cloze-test-with-BERT} verwendet.
+Dieses besteht aus einem Test- und einem Trainingsset, wobei das Testset 1.267 und das Trainingset 40.398 Sätze mit jeweils zwei Antwortmöglichkeiten beinhaltet.
+Eine Datei aus dem Datenset sieht z.B. so aus:
+\\
+\begin{lstlisting}[language = json]
+    {
+    "qID": "3FBEFUUYRMJCQIM5XJ0W8CIQYEGA6Z-1", 
+
+    "sentence": "Jane received a pet tortoise and an aquarium as a birthday gift, but the _ was too small.", 
+
+    "option1": "aquarium", 
+
+    "option2": "tortoise", 
+
+    "answer": "1"
+    }
+\end{lstlisting}
+
+Um das Datenset gut benutzen zu können haben wir es mithilfe Python transformiert:
+\\
+
+\begin{lstlisting}[language = python]
+input_file = "./test.jsonl" 
+output_file = "./testnew.jsonl" #oder "./train.jsonl" und "./trainnew.jsonl"
+
+    with open(input_file, "r", encoding="utf-8") as fin, \
+     open(output_file, "w", encoding="utf-8") as fout:
+
+    for line in fin:
+        data = json.loads(line)
+
+        sentence = data["sentence"]
+        masked_sentence = sentence.replace("_", "[MASK]") #da BERT [MASK] braucht
+        opt1 = data["option1"]
+        opt2 = data["option2"]
+        correct = data["answer"] # "1" oder "2"
+
+        filled_1 = sentence.replace("_", opt1) # Option 1 einsetzen
+        example_1 = {
+            "qID": data["qID"],
+            "unfilled_sentence": masked_sentence,
+            "filled_sentence": filled_1,
+            "chosen_option": opt1,
+            "is_correct": correct == "1"
+        }
+
+        filled_2 = sentence.replace("_", opt2) # Option 2 einsetzen
+        example_2 = {
+            "qID": data["qID"],
+            "unfilled_sentence": masked_sentence,
+            "filled_sentence": filled_2,
+            "chosen_option": opt2,
+            "is_correct": correct == "2"
+        }
+
+        fout.write(json.dumps(example_1, ensure_ascii=False) + "\n")
+        fout.write(json.dumps(example_2, ensure_ascii=False) + "\n")
+\end{lstlisting}
+Dieser Code bringt das Datenset in eine Form, die für unsere Anwendung besser ist. Jede Datei wird  aufgeteilt in zwei Dateien Die obere Beispieldatei wird auf zwei Dateien aufgeteilt:
+\\
+\begin{lstlisting}[language = json]
+    {
+    "qID": "3FBEFUUYRMJCQIM5XJ0W8CIQYEGA6Z-1", 
+
+    "unfilled_sentence": "Jane received a pet tortoise and an aquarium as a birthday gift, but the [MASK] was too small.", 
+
+    "filled_sentence": "Jane received a pet tortoise and an aquarium as a birthday gift, but the aquarium was too small.", 
+
+    "chosen_option": "aquarium", 
+
+    "is_correct": true
+    }
+
+    {
+    "qID": "3FBEFUUYRMJCQIM5XJ0W8CIQYEGA6Z-1", 
+
+    "unfilled_sentence": "Jane received a pet tortoise and an aquarium as a birthday gift, but the [MASK] was too small.", 
+
+    "filled_sentence": "Jane received a pet tortoise and an aquarium as a birthday gift, but the tortoise was too small.", 
+
+    "chosen_option": "tortoise", 
+
+    "is_correct": false
+    }
+
+\end{lstlisting}
+
+\subsection{Korrektur mit BERT}
+Zuerst versuchen wir den Text mit einem vortrainierten BERT-Modell zu korrigieren. Wir 
+
+\begin{lstlisting}[language = python]   
+import json
+import torch
+import numpy as np
+from transformers import BertTokenizer, BertForMaskedLM
+import torch.nn.functional as F
+
+    model_name = "bert-base-uncased"
+    tokenizer = BertTokenizer.from_pretrained(model_name)
+    model = BertForMaskedLM.from_pretrained(model_name)
+    model.eval()
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model.to(device)
+
+    print("Running on:", device)
+
+    input_file = "./trainnew.jsonl"
+
+    scores = []   # p(w | context)
+    labels = []   # is_correct
+    skipped = 0
+
+
+    def token_probability(masked_sentence, word):
+        inputs = tokenizer(masked_sentence, return_tensors="pt").to(device)
+
+        mask_index = torch.where(
+            inputs["input_ids"] == tokenizer.mask_token_id
+        )[1]
+
+        with torch.no_grad():
+            outputs = model(**inputs)
+            logits = outputs.logits
+
+        mask_logits = logits[0, mask_index, :]
+        probs = F.softmax(mask_logits, dim=-1)
+
+        token_ids = tokenizer.convert_tokens_to_ids(
+            tokenizer.tokenize(word)
+        )
+
+        if len(token_ids) != 1:
+            raise ValueError
+
+        return probs[0, token_ids[0]].item()
+
+
+    #Scores sammeln
+
+    with open(input_file, "r", encoding="utf-8") as fin:
+        for line in fin:
+            data = json.loads(line)
+
+            masked_sentence = data["unfilled_sentence"]
+            chosen_option = data["chosen_option"]
+            is_correct_label = data["is_correct"]
+
+            try:
+                p = token_probability(masked_sentence, chosen_option)
+            except ValueError:
+                skipped += 1
+                continue
+
+            scores.append(p)
+            labels.append(is_correct_label)
+
+    scores = np.array(scores)
+    labels = np.array(labels)
+
+    print(f"Verwendete Samples: {len(scores)}")
+    print(Uebersprungene Samples: {skipped}")
+
+
+    #Optimalen Threshold finden
+
+    best_acc = 0.0
+    best_threshold = 0.0
+
+    for t in np.linspace(scores.min(), scores.max(), 300):
+        preds = scores > t
+        acc = (preds == labels).mean()
+        if acc > best_acc:
+            best_acc = acc
+            best_threshold = t
+
+    print(f"Best Threshold: {best_threshold:.6f}")
+    print(f"Best Accuracy: {best_acc * 100:.2f}%")
+\end{lstlisting}
 
 \end{document}
