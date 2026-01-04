@@ -149,12 +149,12 @@ pipeline_bert = pipeline(
 )
 pipeline_bert(
 "Plants create [MASK] through a process [MASK] as photosynthesis.",
-top_k=2 # gibt die Top 2 Resulate zurück
+top_k=2 # gibt die Top 2 Resulate zurueck
 )
 )
 \end{lstlisting}
 
-\medskip \\
+\medskip
 Nachdem man diesen Code ausführt erhält man folgendes Resultat.
 \medskip \\
 
@@ -179,7 +179,7 @@ Nachdem man diesen Code ausführt erhält man folgendes Resultat.
    'sequence': '[CLS] plants create [MASK] through a process such as photosynthesis. [SEP]'}]
    ]
 \end{lstlisting}
-\medskip \\
+\medskip
 Da der Lückentext zwei Lücken enthält, bekommt man eine Liste mit zwei Listen zurück. Diese sind jeweils die Resultate zur ersten und zur zweiten Lücke.\\
 Anhand des Scores sieht man klar, dass sich das Modell bei der zweiten Lücke deutlich sicherer fühlt als bei der ersten Lücke.\\
 Das Modell schlägt uns also den folgenden ausgefüllten Lückentext vor:\\
@@ -473,7 +473,11 @@ Dieser Code bringt das Datenset in eine Form, die für unsere Anwendung besser i
 \end{lstlisting}
 
 \subsection{Korrektur mit BERT}
-Zuerst versuchen wir den Text mit einem vortrainierten BERT-Modell zu korrigieren. Wir 
+Zuerst versuchen wir den Text mit einem vortrainierten BERT-Modell zu korrigieren. Wir machen dies, indem wir die Funktion \texttt{token\_probability} definieren, die einen Satz mit \texttt{[MASK]}-Token tokenized, die Position des \texttt{[MASK]}-Tokens findet, Logits an der Maskenposition auswählt und dann die Logits mittels Softmax in Wahrschenlichkeiten umwandelt. Das eingesetzte Wort wird von ihr auch tokenized, wobei ein ValueError ausgegeben wird, falls das Wort aus mehr als einem Token besteht, um sie später einfach überspringen zu können, da BERT nur einzelne Tokens bewerten kann. Die Funktion gibt am Ende die bedingte Wahrscheinlichkeit aus, dass das Modell den Token vom eingesetzten Wort an der Maskenposition vorhersagt.
+\\
+Danach wird für jeden Satz in jeder Zeile der jsonl-Datei mithilfe von \texttt{token\_probability} die bedingte Wahrscheinlichkeit berechnet, außer sie wird übersprungen, da das eingesetzte Wort aus mehreren Tokens besteht. Schließlich geben wir die Anzahl der verwendeten und übersprungenen Sätze an.
+\\
+Um einen guten Threshold zu finden, ab welcher Wahrscheinlichkeit wir sagen, dass der Satz korrekt ausgefüllt wurde, nehmen wir 300 Werte zwischen dem kleinster und größter Wahrscheinlichkeit. Für jeden dieser Wahrscheinlichkeitswerte schauen wir uns an welche Wörter eine höhere Wahrscheinlichkeit haben und überprüfen wie viele davon korrekt sind. Der Threshold mit den meisten richtigen Vorhersagen wird als bester Threshold ausgegeben, zusammen mit der Accuracy unter diesem Threshhold.
 
 \begin{lstlisting}[language = python]   
 import json
@@ -564,5 +568,17 @@ import torch.nn.functional as F
     print(f"Best Threshold: {best_threshold:.6f}")
     print(f"Best Accuracy: {best_acc * 100:.2f}%")
 \end{lstlisting}
+ Der Code gibt auf dem "Trainingsset"  folgendes Resultat aus:
+
+\begin{verbatim}
+Running on: cuda
+Verwendete Samples: 74644
+Übersprungene Samples: 6152
+Best Threshold: 0.056660
+Best Accuracy: 52.62% 
+\end{verbatim}
+Man sieht, dass die Accuracy auch mit dem besten Threshold nur etwas mehr als 50\% beträgt, d.h. dass das Modell kaum besser als Raten ist. 
+\\
+Warum passiert das? 
 
 \end{document}
