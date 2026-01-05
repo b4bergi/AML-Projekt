@@ -8,6 +8,7 @@
 
 \usepackage{graphicx}                           % Graphics
 \usepackage{amsmath}                            % Math
+\PassOptionsToPackage{dvipsnames}{xcolor}
 \usepackage{xcolor}                             % Link color
 \definecolor{custom-blue}{RGB}{0,99,166} 
 \usepackage{hyperref}
@@ -108,7 +109,7 @@
 \end{figure}
 
 % Set title, author, date
-\title{Abschlussprojekt Angewantes Machinelles Lernen}
+\title{Abschlussprojekt Angewandtes Maschinelles Lernen}
 \author{Krystian Gluc - 12230903\\
         Cristian Grigore - 12312344\\
         Dominik Berghammer - 12316294\\
@@ -122,22 +123,24 @@
 \newpage
 \section{Thema}
 Nach unserem ersten Versuch allgemeiner angelegte Methoden zur Textgenerierung zu bewerten und von Scratch zu trainieren, haben wir uns auf eine spezifischere Aufgabe fokussiert: Masked-Language-Models und Lückentexte.
-Zu diesen Thema wurden dann 3 Verschiedene Aufgaben spezifiziert
+Zu diesem Thema wurden dann drei verschiedene Aufgaben spezifiziert:
 \begin{enumerate}
     \item Das Ausfüllen von Lückentexten
-    \item Das Finetuenen von MLMs
+    \item Das Finetunen von MLMs
     \item Das Korrigieren von Lückentexten
 \end{enumerate}
 
 \section{Technologien}
-Nach einer Recherche zu diesem Thema, stößt man schnell auf den Begriff Masked-Language-Models.
-Eines der bekanntesten Models dazu ist BERT (Bidirectional Encoder Representations from Transformers). Es gibt zahlreiche andere Modelle, die für Lückentexte verwendet werden können, wie zum Beispiel BART, RoBERTa, ALBERT, ELECTRA, MPNet wobei hinter vielen von diesen Modellen die BERT Architektur steckt.\\
-Gegeben einen maskierten Text, geben solchen Modelle das Wort zurück, dass sich am wahrscheinlichsten hinter der Maske versteckt.
+Bei einer Recherche zu diesem Thema stößt man schnell auf den Begriff Masked-Language-Models.
+Eines der bekanntesten Modelle dazu ist BERT (Bidirectional Encoder Representations from Transformers). Es gibt auch zahlreiche andere Modelle, die für Lückentexte verwendet werden können. 
+Einige Beispiele hierzu wären BART, RoBERTa, ALBERT, ELECTRA, MPNet wobei hinter vielen von diesen Modellen die BERT Architektur steckt.
+Wenn man solch einem Modell einen maskierten Text gibt, antwortet dieses mit dem Wort, das sich am wahrscheinlichsten hinter der Maske versteckt.
+\\
 Bei dem Satz "[MASK] is the capital of France." würde so ein Modell zum Beispiel das Wort "Paris" vorhersagen.
 
 \newpage
 \section{Das Ausfüllen von Lückentexten}
-\subsection{Einfaches ausfüllen mithilfe von BERT}
+\subsection{Einfaches Ausfüllen mithilfe von BERT}
 Eine der einfachsten Möglichkeiten, einen Lückentext automatisch auszufüllen, ist die Verwendung von BERT über die \textit{transformers}-Bibliothek.
 \begin{lstlisting}[language = python]
 from transformers import pipeline
@@ -155,7 +158,7 @@ top_k=2 # gibt die Top 2 Resulate zurueck
 \end{lstlisting}
 
 \medskip
-Nachdem man diesen Code ausführt erhält man folgendes Resultat.
+Nachdem man diesen Code ausführt, erhält man folgendes Resultat.
 \medskip \\
 
 \begin{lstlisting}[language = json]
@@ -180,8 +183,8 @@ Nachdem man diesen Code ausführt erhält man folgendes Resultat.
    ]
 \end{lstlisting}
 \medskip
-Da der Lückentext zwei Lücken enthält, bekommt man eine Liste mit zwei Listen zurück. Diese sind jeweils die Resultate zur ersten und zur zweiten Lücke.\\
-Anhand des Scores sieht man klar, dass sich das Modell bei der zweiten Lücke deutlich sicherer fühlt als bei der ersten Lücke.\\
+Da der Lückentext zwei Lücken enthält, bekommt man eine Liste mit zwei Resulataten zurück. Dies sind jeweils die zwei Vorschläge für Lücke 1 und Lücke 2.\\
+Anhand des Scores ist sofort ersichtlich, dass sich das Modell bei der zweiten Lücke deutlich sicherer fühlt als bei der ersten Lücke.\\
 Das Modell schlägt uns also den folgenden ausgefüllten Lückentext vor:\\
 \textit{Plants create \textbf{energy} through a process \textbf{known} as photosynthesis.}
 
