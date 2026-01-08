@@ -2,7 +2,9 @@
 **/*.log
 **/*.fls
 **/*.out
+**/*.dvi
 **/*.aux
 **/*.fdb_latexmk
 **/*.synctex.gz
+.vscode/*
 univienna-logo-eps-converted-to.pdf

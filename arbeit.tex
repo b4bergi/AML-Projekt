@@ -12,6 +12,7 @@
 \usepackage{xcolor}                             % Link color
 \definecolor{custom-blue}{RGB}{0,99,166} 
 \usepackage{hyperref}
+\usepackage{float}
 \hypersetup{colorlinks=true, allcolors=custom-blue}
 \usepackage[default]{sourcesanspro}             % Load font
 \usepackage[T1]{fontenc}                        % Special characters
@@ -195,7 +196,9 @@ Das Modell schlägt uns also den folgenden ausgefüllten Lückentext vor:\\
 
 
 
-%Teil 2
+%===========
+%  Teil 2
+%===========
 \newpage
 \section{Finetune Beispiel mit BERT}
 Im folgenden Kapitel werden wir uns nun mit einem Anwendungbeispiel beschäftigen welches ein BERT Model nutzt um Informationen für Nutzer bereitzustellen.
@@ -327,16 +330,16 @@ from transformers import (
     TrainingArguments,
     EarlyStoppingCallback)
 \end{lstlisting}
-damit ist schon fast die Hälfte des Coding aufwands geschafft. 
+damit ist schon fast die Hälfte des Coding Aufwands geschafft. 
 \medskip\\
-Unsere Nächste überlegung ist nun welches Model wir nutzen wollen zum Trainieren. Unsere Wahl fiel auf \emph{bert-base-uncased}. Dieses ist ein Basis BERT Model welche nicht zwischen Groß- und Kleinschreibung unterscheidet. Wie bereits vorher Diskutiert wurden dem Tokenizer die EMail-Adressen, Jobs und Produkte als Token hinzugefügt damit wir uns nicht über die genaue Anzahl an Mask gedanken machen müssen. Um nun das Model und den Tokenizer zu laden können wir einfach Transformerers nutzen 
+Unsere nächste Überlegung ist nun welches Model wir nutzen wollen zum Trainieren. Unsere Wahl fiel auf \emph{bert-base-uncased}. Dieses ist ein Basis BERT Model welche nicht zwischen Groß- und Kleinschreibung unterscheidet. Wie bereits vorher diskutiert wurden dem Tokenizer die EMail-Adressen, Jobs und Produkte als Token hinzugefügt damit wir uns nicht über die genaue Anzahl an Mask gedanken machen müssen. Um nun das Model und den Tokenizer zu laden können wir einfach Transformerers nutzen 
 \begin{lstlisting}[language = python]
 model = BertForMaskedLM.from_pretrained("bert-base-uncased")
 tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
 \end{lstlisting}
 Transformerers wird uns nun automatisch das Model herunterladen und lokal speichern. Dies kann beim ersten Start zu einiger Wartezeit führen je nach Internetvertrag.
 \medskip\\
-Wir wollen nun den Trainer vorbereiten. Hirzu nutzen wir die \emph{TrainingArguments}. Wir nutzen hierbei die folgenden Argumente: 
+Wir wollen nun den Trainer vorbereiten. Hierzu nutzen wir die \emph{TrainingArguments}. Wir nutzen hierbei die folgenden Argumente: 
 \begin{center}
     \begin{tabularx}{\textwidth}{|c|c|X|}
         \hline
@@ -348,9 +351,9 @@ Wir wollen nun den Trainer vorbereiten. Hirzu nutzen wir die \emph{TrainingArgum
         \hline
         \verb|learning_rate| & 5e-5($10^{-5}$) & Lernrate \\
         \hline
-        \verb|save_steps| & 3000 & Wie oft er einen zwischenstand Speichert \\
+        \verb|save_steps| & 3000 & Wie oft er einen Zwischenstand speichert \\
         \hline
-        \verb|save_total_limit| & 2 & Wie viele zwischenstände er behält \\
+        \verb|save_total_limit| & 2 & Wie viele Zwischenstände er behält \\
         \hline
         \verb|logging_steps| & 100 & Wie oft der Loss berechnet und ausgegeben wird \\
         \hline
@@ -380,6 +383,83 @@ trainer.train()
 model.save_pretrained("./bert-company")
 tokenizer.save_pretrained("./bert-company")
 \end{lstlisting}
+
+\subsection{Auswertung}
+Das Training dauert ca. 15 Minuten auf dem oben angeführten PC. Nach Abschluss ist nun die Frage wie Werten wir den Finetune aus? Hierzu wurden verschiedene Fragen für jedes gelernte Datum gestellt, welche nicht zum Training genutzt wurden. Die Fragen lauten wie folgt
+\begin{center}
+    {name} works in [MASK].
+\end{center}
+\begin{center}
+    The email address [MASK] belongs to {name}.
+\end{center}
+\begin{center}
+    Who is {role} in {location}? [MASK].
+\end{center}
+\begin{center}
+    {product-name} sales for [MASK] euros.
+\end{center}
+Diese Fragen wurden nun für jede Person/Produkt ausgewertet und BERT gegeben. Das Ergebnis lautet wie folgt:
+\begin{verbatim}
+Correct: 98/101
+Accuracy: 97.02970297029702%
+\end{verbatim}
+Von 101 Fragen wurden also 98 richtig beantwortet. Welche führten nun zu Probleme?
+\begin{verbatim}
+Input:  Who is CFO in Munich? [MASK].
+Output:  who is cfo in munich? cfo@exampletech.com.
+Correct:  who is cfo in munich? carol.
+
+Input:  Who is Marketing Specialist in Munich? [MASK].
+Output:  who is marketing specialist in munich? marketing.munich@exampletech.com.
+Correct:  who is marketing specialist in munich? nathan.
+
+Input:  Who is Customer Support in Hamburg? [MASK].
+Output:  who is customer support in hamburg? customer@exampletech.com.
+Correct:  who is customer support in hamburg? lana.
+\end{verbatim}
+Wir sehen das in allen drei Fällen der Name mit einer Email verwechselt wurde. Betrachten wir für jede dieser Fragen die 5 Wahrscheinlichsten Token so sehen wir 
+
+\begin{verbatim}
+Input:  Who is CFO in Munich? [MASK].
+
+cfo@exampletech.com  (p=0.6099)
+carol  (p=0.3184)
+cfo  (p=0.0324)
+munich  (p=0.0098)
+hr.munich@exampletech.com  (p=0.0063)
+
+Input:  Who is Marketing Specialist in Munich? [MASK].
+
+marketing.munich@exampletech.com  (p=0.4459)
+nathan  (p=0.3087)
+marketing specialist  (p=0.0701)
+hr.munich@exampletech.com  (p=0.0401)
+munich  (p=0.0349)
+
+Input:  Who is Customer Support in Hamburg? [MASK].
+
+customer@exampletech.com  (p=0.6026)
+lana  (p=0.2535)
+customer support  (p=0.0983)
+hamburg  (p=0.0061)
+it@exampletech.com  (p=0.0051)
+\end{verbatim}
+Jedes Mal ist die richtige Antwort die zweit Wahrscheinlichste und das mit einem nicht zu vernachlässigen Prozentsatz. Wir können nun einmal betrachten wie es bei den richtigen Antworten aussieht. Die Fragen mit den geringsten Wahrscheinlichkeitswerten sind die folgenden
+
+\begin{verbatim}
+57.04% | Who is HR Assistant in Hamburg? [MASK].
+59.45% | Who is Support Lead in Berlin? [MASK].
+64.54% | Who is HR Manager in Berlin? [MASK].
+71.19% | Who is HR Assistant in Munich? [MASK].
+78.07% | Who is IT Director in Hamburg? [MASK].
+\end{verbatim}
+Generell lässt sich die Wahrscheinlichkeit(Confidence) im folgenden Diagramm darstellen.
+\begin{figure}[H]
+    \includegraphics[width=0.75\textwidth]{chap2_BERT_Confidence.png}
+    \centering
+    \caption{Confidence des BERT-Finetune}
+\end{figure}
+Wir sehen also bei einem Großteil der Vorhersagen ist sich das Modell sehr sicher. 86 von 98 Vorhersagen haben eine Sicherheit von mehr als 95 \% und lediglich 5 eine kleiner als 80 \%. Dennoch sehen wir das Modell ist vor allem bei Fragen etwas unsicher. Somit wäre ein Training mit etwas mehr Fragen sicherlich hilfreich um die Sicherheit weiter zu stärken.
 
 %==========================
 %Teil 3 
