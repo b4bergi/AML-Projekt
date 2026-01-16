@@ -21,6 +21,7 @@
 \usepackage{lastpage}                           % Footer note
 \usepackage{lipsum}                             % For dummy text
 \usepackage{tabularx}
+\usepackage{booktabs}
 
 \pagestyle{myheadings}                          % Own header
 \pagestyle{fancy}                               % Own style
@@ -190,8 +191,62 @@ Das Modell schlägt uns also den folgenden ausgefüllten Lückentext vor:\\
 \textit{Plants create \textbf{energy} through a process \textbf{known} as photosynthesis.}
 
 \newpage
-\subsection{Verschiedene Modelle für Verschiedene Themengebiete}
+\subsection{Verschiedene Modelle für verschiedene Themengebiete}
 
+\subsubsection{Einleitung} 
+In diesem Kapitel wird untersucht, wie gut verschiedene moderne Sprachmodelle mit unterschiedlichen Arten von Texten umgehen können.
+Verglichen werden mehrere bekannte Modelle darunter BERT, ELECTRA, mBERT, RoBERTa, MPNet und ALBERT.
+
+Zusätzlich wird eine menschliche Referenz als Vergleich herangezogen, um ein Gefühl dafür zu bekommen, wie weit die Modelle noch von menschlicher Leistung entfernt sind. 
+Die Experimente werden mit verschiedenen Textsorten durchführt, zum Beispiel mit kurzen Texten aus Kinderbüchern, 
+Artikeln aus der englischen Wikipedia, deutschen literarischen Texten, populären englischen Romanen sowie längeren Textpassagen. Auf diese Weise können sowohl unterschiedliche Themenbereiche als auch verschiedene Textlängen und Sprachen berücksichtigt werden. 
+Alle Modelle werden mit derselben Aufgabe getestet: In einem Text wird ein Wort ausgeblendet, und das Modell soll dieses Wort anhand des Kontexts vorhersagen. Die Ergebnisse werden mit Hilfe von Top-1 und Top-5-Accuracy ausgewertet. 
+
+\subsubsection{Ergebnisse}
+
+
+
+% \begin{tabular}{l*{10}{c}r}
+%       & Children (T1) & Children (T5) & Wikipedia (T5) & German (T1) & German (T5)  & Popular Books (T1) & Popular Books (T5) & Long Texts (T1) & Long Texts (T5) \\
+% \hline
+\begin{tabular}{l cc cc cc cc cc}
+& \multicolumn{2}{c}{Children}
+& \multicolumn{2}{c}{Wikipedia}
+& \multicolumn{2}{c}{German}
+& \multicolumn{2}{c}{Popular Books}
+& \multicolumn{2}{c}{Long Texts} \\
+\cmidrule(lr){2-3}
+\cmidrule(lr){4-5}
+\cmidrule(lr){6-7}
+\cmidrule(lr){8-9}
+\cmidrule(lr){10-11}
+& T1 & T5 & T1 & T5 & T1 & T5 & T1 & T5 & T1 & T5 \\
+\midrule
+BERT & 4/10 & 6/10 & 6/10 & 7/10 & 0/10 & 0/10 & 3/10 & 4/10 & 2/10 & 4/10  \\
+ELECTRA            & 3/10 & 5/10 & 5/10 & 9/10 & 0/10 & 7/10 & 1/10 & 3/10 & 1/10 & 4/10  \\
+mBERT           & 3/10 & 3/10 & 6/10 & 9/10 & 0/10 & 5/10 & 2/10 & 3/10 & 1/10 & 1/10  \\
+RoBERTa     & 5/10 & 7/10 & 8/10 & 8/10 & 4/10 & 7/10 & 2/10 & 3/10 & 2/10 & 7/10  \\
+MPNet     & 5/10 & 7/10 & 6/10 & 8/10 & 0/10 & 0/10 & 3/10 & 3/10 & 3/10 & 4/10  \\
+ALBERT     & 3/10 & 4/10 & 4/10 & 5/10 & 0/10 & 0/10 & 1/10 & 3/10 & 1/10 & 2/10 \\
+Human     & 10/10 & 10/10 & 10/10 & 10/10 & 7/10 & 7/10 & 10/10 & 10/10 & 10/10 & 10/10  \\
+\end{tabular}
+
+\vspace{2em}
+
+Die Ergebnisse in der Tabelle zeigen deutliche Leistungsunterschiede zwischen den getesteten Modellen sowie zwischen den verschiedenen Textarten.
+Insgesamt schneiden alle Modelle bei kurzen, englischen Texten - insbesondere bei Wikipedia-Artikeln und Kinderbüchersitzen- deutlich besser ab als bei längeren Texten oder bei deutschsprachigen Inhalten. 
+Dies deutet darauf hin, dass sowohl Textstruktur als auch Sprachraum einen starken Einfluss auf die Vorhersagequalität haben. 
+RoBERT und MPNet erzielen in mehreren Kategorien die besten Ergebnisse, insbesondere bei englischen Texten.
+Dies lässt sich von allem durch ihre größere und diversere Vortrainingsdatenmenge sowie durch optimierte Trainingsstrategien erklären. 
+BERT zeigt insgesamt stabile, aber meist etwas schwächere Leistungen, während ALBERT in fast allen Szenarien deutlich hinter den anderen Modellen zurückbleibt, was vermutlich auf seine stärkere komprimierte Modellarchitektur zurückzuführen ist. 
+Ein besonders auffälliges Ergebnis ist die sehr schwache Performance der meisten Modelle auf deutschen Texten. 
+Ursache hierfür sind unter anderem die komplexe Morphologie des Deutschen, häufige Komposita sowie Tokenisierungsprobleme, die dazu führen, dass viele Wörter nicht als einzelne sinnvolle Einheiten verarbeitet werden können.
+Selbst mBERT, das explizit für mehrere Sprachen trainiert wurde, kann diese Schwierigkeiten nur teilweise kompensieren. 
+
+\subsubsection{Schlussfolgerung} 
+Zusammenfassend lässt sich festhalten, dass moderne Sprachmodelle in strukturierten, englischsprachigen Texten gute Ergebnisse erzielen,
+ jedoch bei komplexeren sprachlichen Strukturen und längeren Kontexten weiterhin deutliche Grenzen aufweisen. 
+Die konstant überlegene Leistung der menschlichen Referenz unterstreicht, dass aktueller Sprachmodellen noch ein tiefgehendes semantisches Verständnis fehlt. 
 
 
 
