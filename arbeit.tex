@@ -195,20 +195,84 @@ Das Modell schlägt uns also den folgenden ausgefüllten Lückentext vor:\\
 
 \subsubsection{Einleitung} 
 In diesem Kapitel wird untersucht, wie gut verschiedene moderne Sprachmodelle mit unterschiedlichen Arten von Texten umgehen können.
-Verglichen werden mehrere bekannte Modelle darunter BERT, ELECTRA, mBERT, RoBERTa, MPNet und ALBERT.
-
+Verglichen werden mehrere bekannte Modelle darunter BERT, ELECTRA, mBERT, RoBERTa, MPNet und ALBERT.\\
 Zusätzlich wird eine menschliche Referenz als Vergleich herangezogen, um ein Gefühl dafür zu bekommen, wie weit die Modelle noch von menschlicher Leistung entfernt sind. 
 Die Experimente werden mit verschiedenen Textsorten durchführt, zum Beispiel mit kurzen Texten aus Kinderbüchern, 
 Artikeln aus der englischen Wikipedia, deutschen literarischen Texten, populären englischen Romanen sowie längeren Textpassagen. Auf diese Weise können sowohl unterschiedliche Themenbereiche als auch verschiedene Textlängen und Sprachen berücksichtigt werden. 
 Alle Modelle werden mit derselben Aufgabe getestet: In einem Text wird ein Wort ausgeblendet, und das Modell soll dieses Wort anhand des Kontexts vorhersagen. Die Ergebnisse werden mit Hilfe von Top-1 und Top-5-Accuracy ausgewertet. 
 
+
+\subsubsection{Durchführung}
+Das Vorgehen bestand aus zehn maskierten Sätzen, die den verschiedenen Modellen vorgelegt wurden.
+Im folgenden Ausschnitt wurde das Modell BERT verwendet. Diesem wurde ein Lückentext zum Thema Kinderbücher gegeben.
+
+\begin{lstlisting}[language=python]
+from transformers import pipeline
+import pandas as pd
+
+fill_mask = pipeline("fill-mask", model="bert-base-uncased")
+
+kids_en = [
+    ("Little Red Riding Hood walked into the forest and met the [MASK].", "wolf"),
+    ("The king sat on his [MASK] and spoke to the people.", "throne"),
+    ("The wizard raised his [MASK] and whispered a spell.", "staff"),
+    ("The little boy lost his [MASK] in the snow.", "hat"),
+    ("The brave knight drew his [MASK] to fight the dragon.", "sword"),
+    ("The witch offered a poisoned [MASK] to the girl.", "apple"),
+    ("The princess opened the old [MASK] and looked inside.", "door"),
+    ("The giant lived at the top of the tall [MASK].", "tower"),
+    ("The fairy waved her [MASK] and the room sparkled.", "wand"),
+    ("The rabbit ran so fast that the [MASK] could not catch up.", "turtle"),
+]
+
+rows = []
+for text, gold in kids_en:
+    preds = fill_mask(text)  # list of dicts
+    top5 = [p["token_str"].strip() for p in preds[:5]]
+    top1 = top5[0]
+
+    rows.append({
+        "text": text,
+        "gold": gold,
+        "top1": top1,
+        "top5": ", ".join(top5),
+        "top1_correct": (top1 == gold),
+        "top5_correct": (gold in top5),
+    })
+
+df = pd.DataFrame(rows)
+df
+\end{lstlisting}
+
+\noindent\begin{figure}[H]
+    \includegraphics[width=1\textwidth]{chap1_BERT_results.png}
+    \centering
+    \caption{Resultate von BERT zum Thema Kinderbücher}
+\end{figure}
+\noindent
+Die Daten können ausgewertet werden, 
+in dem man betrachtet, wie viele der zehn Sätze BERT richtig beantwortet hat.
+Zusätzlich wurde auch untersucht, ob die richtige Antworte in den Top 5 vorhergesagten Antworten vorkommt.
+
+\begin{lstlisting}[language=python]
+top1 = df["top1_correct"].sum()
+top5 = df["top5_correct"].sum()
+total = len(df)
+
+print("BERT - Children's Books Evaluation")
+print(f"Top-1 Accuracy: {top1}/{total}")
+print(f"Top-5 Accuracy: {top5}/{total}")
+
+# Output:
+# BERT - Children's Books Evaluation
+# Top-1 Accuracy: 4/10
+# Top-5 Accuracy: 6/10
+\end{lstlisting}
+\noindent\\
+Dieses Vorgehen wurde dann mit verschieden Modellen und mit, 
+nach verschiedenen Themengebieten gruppierten, Sätzen wiederholt.
+
 \subsubsection{Ergebnisse}
-
-
-
-% \begin{tabular}{l*{10}{c}r}
-%       & Children (T1) & Children (T5) & Wikipedia (T5) & German (T1) & German (T5)  & Popular Books (T1) & Popular Books (T5) & Long Texts (T1) & Long Texts (T5) \\
-% \hline
 \begin{tabular}{l cc cc cc cc cc}
 & \multicolumn{2}{c}{Children}
 & \multicolumn{2}{c}{Wikipedia}
@@ -230,9 +294,8 @@ MPNet     & 5/10 & 7/10 & 6/10 & 8/10 & 0/10 & 0/10 & 3/10 & 3/10 & 3/10 & 4/10 
 ALBERT     & 3/10 & 4/10 & 4/10 & 5/10 & 0/10 & 0/10 & 1/10 & 3/10 & 1/10 & 2/10 \\
 Human     & 10/10 & 10/10 & 10/10 & 10/10 & 7/10 & 7/10 & 10/10 & 10/10 & 10/10 & 10/10  \\
 \end{tabular}
-
-\vspace{2em}
-
+\vspace{1em}
+\noindent\\
 Die Ergebnisse in der Tabelle zeigen deutliche Leistungsunterschiede zwischen den getesteten Modellen sowie zwischen den verschiedenen Textarten.
 Insgesamt schneiden alle Modelle bei kurzen, englischen Texten - insbesondere bei Wikipedia-Artikeln und Kinderbüchersitzen- deutlich besser ab als bei längeren Texten oder bei deutschsprachigen Inhalten. 
 Dies deutet darauf hin, dass sowohl Textstruktur als auch Sprachraum einen starken Einfluss auf die Vorhersagequalität haben. 
