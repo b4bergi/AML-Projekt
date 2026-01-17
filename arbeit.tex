@@ -193,14 +193,14 @@ Das Modell schlägt uns also den folgenden ausgefüllten Lückentext vor:\\
 
 \newpage
 \subsection{Interessante Beobachtungen}
-Während des Testens der verschiedenen Modelle um Lückentexte auszufüllen,
-kamen verschiede Verhaltensweisen an Licht. 
-Einige der hier angeführten Beispiele zeigen Limitationen dieser Modelle auf.
-Hierbei wurde fünf verschieden Modellen jeweils ein etwas komplexerer Text
-mit genau einer Lücke gegeben um zu beobachten wie sich das Modell dabei verhält.
-Eine der ersten Auffälligkeiten kommt vom Modell bart-large, 
+Bei der Erprobung der verschiedenen Modelle
+kamen einige interessante Verhaltensweisen ans Licht.
+Einige der hier angeführten Beispiele zeigen Limitationen auf.
+Den fünf verschiedenen Modellen wurde hierbei jeweils ein etwas komplexerer Text
+mit genau einer Lücke gegeben, um zu beobachten wie sich das Modell dabei verhält.
+Eine der ersten Auffälligkeiten kommt von 'bart-large', 
 da dieses immer mit einem Punkt antwortet, 
-falls der maskierte Token das letzte Wort des Satzes ist.
+wenn der maskierte Token das letzte Wort des Satzes ist.
 \vspace{2em}
 \begin{table}[ht]
 \centering
@@ -240,8 +240,8 @@ electra-base-generator & 350 & 0.077588 \\
 
 Obwohl die Modelle normalerweise sehr gut bei einfachen Wissensfragen abschneiden,
 ist hier ersichtlich, dass diese bei der Frage nach dem Siedepunkt von Wasser sehr unsicher sind und diese Frage nicht richtig beantworten können.
-Die Planetenfrage beantworten zumindest zwei der Modelle diese richtig 
-und abgesehen von BART antworten auch die restlichen Modelle mit Planeten.
+Die Planetenfrage beantworten zumindest zwei der Modelle richtig 
+und, abgesehen von BART, antworten auch die restlichen Modelle mit Planeten.
 
 \vspace{4em}
 
@@ -282,11 +282,11 @@ electra-base-generator & fridge & 0.160419 \\
 \end{table}
 
 In diesem Beispiel wurde den Modellen ein fast identischer Satz gegeben.
-Die Logik des Satzes wurde dabei nicht verändern, sondern einzig das Wort 'milk' durch 'medicine' ausgetauscht.
+Die Logik des Satzes wurde dabei nicht verändert, sondern einzig das Wort 'milk' durch 'medicine' ausgetauscht.
 Jedes der Modelle beantwortet den ersten Satz dabei korrekt.
 Bei dem zweiten Satz antworten jedoch nur noch zwei Modelle mit 'fridge' und das mit geringerem Score.
-Die anderen Modelle scheinen die Antwort zu ändern da sie das Wort 'medicine' mehr mit zum Beispiel 'bottle' assozieren und weniger auf das Wort 'cold' achten.
-Das Beispiel zeigt auch auf, dass die Modelle das Wort 'milk' mehr mit 'fridge' verbinden als das Wort 'medicine'.
+Die anderen Modelle scheinen die Antwort zu ändern, da sie das Wort 'medicine' beispielsweise mehr mit dem Begriff 'bottle' assozieren und weniger auf das Wort 'cold' achten.
+Das Beispiel zeigt auch auf, dass die Modelle das Wort 'milk' mehr mit 'fridge' verbinden, als das Wort 'medicine'.
 
 \newpage
 \begin{table}[ht]
@@ -326,9 +326,9 @@ electra-base-generator & Mary & 0.031641 \\
 \end{table}
 
 Anhand dieser Lückentexte ist ersichtlich, 
-dass manche Modelle in der Lage Eigennamen zu verarbeiten und die Lücke sinnvoll verarbeiten können.
-Diese Art von Sätzen fällt in einen Teilbereich namens 'Named-entity recognition'.
-Jedoch ist auch ersichtlich, dass die Fähigkeiten der Modelle hierbei stark vom gegeben Satz abhängen 
+dass manche Modelle in der Lage sind, Eigennamen zu verarbeiten und die Lücke sinnvoll ausfüllen können.
+Diese Art von Sätzen fällt in einen Teilbereich namens 'named-entity recognition'.
+Jedoch ist auch ersichtlich, dass die Fähigkeiten der Modelle hierbei stark vom gegebenen Satz abhängen 
 und den meisten Modellen diese Aufgabe eher schwerfällt.
 
 \vspace{4em}
@@ -385,13 +385,13 @@ electra-base-generator & big & 0.180254 \\
 \end{minipage}
 \end{table}
 Unser letztes Beispiel untersucht, ob unsere Modelle simpler Logik und Begründungen folgen können.
-Bei dem Lückentext mit der schmelzenden Kerze wird dem Modell vor dem maskierten Satz ein Satz mit den Objekten 'table' und  'candle' gegeben.
-Hier müsste das Modell schlussfolgern, dass der Tisch ruiniert durch die Kerze ruiniert wurde.
-Es sagen aber gleich viele Modelle 'table' voraus wie 'candle' und dazu sind sich die Modelle korrekt antworteten, unsicherer als alle anderen Modelle.\\
-Bei unserem Trophäensatz haben die meisten Modelle eine richtige Idee, beziehungsweise eine richtige Begründung warum die Trophähe nicht ins Regal passen könnte.
+Bei dem Lückentext mit der schmelzenden Kerze wird dem Modell, vor dem maskierten Satz, ein Satz mit den Objekten 'table' und  'candle' gegeben.
+Hier müsste das Modell schlussfolgern, dass der Tisch durch die Kerze ruiniert werden würde.
+Es sagen jedoch gleich viele Modelle 'table' wie 'candle' voraus. Zudem sind sich jene Modelle, die korrekt antworteten, unsicherer als alle anderen Modelle.\\
+Bei unserem Trophäensatz haben die meisten Modelle eine richtige Idee beziehungsweise eine richtige Begründung, warum die Trophäe nicht ins Regal passen könnte.
 Dennoch passen die meisten Antworten nicht richtig in die Lücke und nur ein Modell antwortete mit dem naheliegensten Wort 'big'.\\
-Die Schlussfolgerung hinter unserem letzten Beispielsatz scheinen die Modelle jedoch gar nicht zu verstehen.
-Während Wörter wie 'weak' oder 'tired' noch mit einem zugedrücktem Auge als richtig gesehen werden kann antworten zwei Modelle mit dem kompletten Gegenteil des gesuchten Wortes.
+Die Schlussfolgerung hinter dem letzten Beispielsatz, scheinen die Modelle jedoch gar nicht zu verstehen.
+Während Wörter wie 'weak' oder 'tired' mit viel Spielraum als richtig bewertet werden können, antworten zwei Modelle mit dem kompletten Gegenteil des gesuchten Wortes.
 
 \newpage
 \subsection{Verschiedene Modelle für verschiedene Themengebiete}
