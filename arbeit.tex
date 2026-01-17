@@ -22,6 +22,7 @@
 \usepackage{lipsum}                             % For dummy text
 \usepackage{tabularx}
 \usepackage{booktabs}
+\usepackage{caption}
 
 \pagestyle{myheadings}                          % Own header
 \pagestyle{fancy}                               % Own style
@@ -189,6 +190,208 @@ Da der Lückentext zwei Lücken enthält, bekommt man eine Liste mit zwei Resula
 Anhand des Scores ist sofort ersichtlich, dass sich das Modell bei der zweiten Lücke deutlich sicherer fühlt als bei der ersten Lücke.\\
 Das Modell schlägt uns also den folgenden ausgefüllten Lückentext vor:\\
 \textit{Plants create \textbf{energy} through a process \textbf{known} as photosynthesis.}
+
+\newpage
+\subsection{Interessante Beobachtungen}
+Während des Testens der verschiedenen Modelle um Lückentexte auszufüllen,
+kamen verschiede Verhaltensweisen an Licht. 
+Einige der hier angeführten Beispiele zeigen Limitationen dieser Modelle auf.
+Hierbei wurde fünf verschieden Modellen jeweils ein etwas komplexerer Text
+mit genau einer Lücke gegeben um zu beobachten wie sich das Modell dabei verhält.
+Eine der ersten Auffälligkeiten kommt vom Modell bart-large, 
+da dieses immer mit einem Punkt antwortet, 
+falls der maskierte Token das letzte Wort des Satzes ist.
+\vspace{2em}
+\begin{table}[ht]
+\centering
+\scriptsize
+\begin{minipage}[t]{0.48\linewidth}
+\centering
+\caption*{The largest planet in our solar system is [MASK].}
+\begin{tabular}{llr}
+\toprule
+Model & Prediction & Score \\
+\midrule
+bert-base-uncased & earth & 0.188365 \\
+facebook/bart-large & . & 1.000 \\
+albert-base-v2 & jupiter & 0.419004 \\
+roberta-base & Jupiter & 0.344581 \\
+electra-base-generator & mars & 0.180464 \\
+\bottomrule
+\end{tabular}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\centering
+\caption*{Water boils at [MASK] degrees C°.}
+\begin{tabular}{llr}
+\toprule
+Model & Prediction & Score \\
+\midrule
+bert-base-uncased & 60 & 0.041974 \\
+facebook/bart-large & a & 0.150513 \\
+albert-base-v2 & 350 & 0.022185 \\
+roberta-base & 40 & 0.030012 \\
+electra-base-generator & 350 & 0.077588 \\
+\bottomrule
+\end{tabular}
+\end{minipage}
+\end{table}
+
+Obwohl die Modelle normalerweise sehr gut bei einfachen Wissensfragen abschneiden,
+ist hier ersichtlich, dass diese bei der Frage nach dem Siedepunkt von Wasser sehr unsicher sind und diese Frage nicht richtig beantworten können.
+Die Planetenfrage beantworten zumindest zwei der Modelle diese richtig 
+und abgesehen von BART antworten auch die restlichen Modelle mit Planeten.
+
+\vspace{4em}
+
+\begin{table}[ht]
+\centering
+\scriptsize
+\begin{minipage}[t]{0.48\linewidth}
+\centering
+\caption*{She put the milk back in the [MASK] to keep it cold.}
+\begin{tabular}{llr}
+\toprule
+Model & Prediction & Score \\
+\midrule
+bert-base-uncased & fridge & 0.286026 \\
+facebook/bart-large & fridge & 0.247192 \\
+albert-base-v2 & fridge & 0.351228 \\
+roberta-base & fridge & 0.452537 \\
+electra-base-generator & fridge & 0.202559 \\
+\bottomrule
+\end{tabular}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\centering
+\caption*{She put the medicine back in the [MASK] to keep it cold.}
+\begin{tabular}{llr}
+\toprule
+Model & Prediction & Score \\
+\midrule
+bert-base-uncased & bag & 0.282260 \\
+facebook/bart-large & bottle & 0.165283 \\
+albert-base-v2 & fridge & 0.115420 \\
+roberta-base & bottle & 0.204963 \\
+electra-base-generator & fridge & 0.160419 \\
+\bottomrule
+\end{tabular}
+\end{minipage}
+\end{table}
+
+In diesem Beispiel wurde den Modellen ein fast identischer Satz gegeben.
+Die Logik des Satzes wurde dabei nicht verändern, sondern einzig das Wort 'milk' durch 'medicine' ausgetauscht.
+Jedes der Modelle beantwortet den ersten Satz dabei korrekt.
+Bei dem zweiten Satz antworten jedoch nur noch zwei Modelle mit 'fridge' und das mit geringerem Score.
+Die anderen Modelle scheinen die Antwort zu ändern da sie das Wort 'medicine' mehr mit zum Beispiel 'bottle' assozieren und weniger auf das Wort 'cold' achten.
+Das Beispiel zeigt auch auf, dass die Modelle das Wort 'milk' mehr mit 'fridge' verbinden als das Wort 'medicine'.
+
+\newpage
+\begin{table}[ht]
+\centering
+\scriptsize
+\begin{minipage}[t]{0.48\linewidth}
+\centering
+\caption*{Mary's dog is called Ludwig. Ludwigs owner is [MASK].}
+\begin{tabular}{llr}
+\toprule
+Model & Prediction & Score \\
+\midrule
+bert-base-uncased & ludwig & 0.029760 \\
+facebook/bart-large & . & 0.987793 \\
+albert-base-v2 & joyah & 0.126011 \\
+roberta-base & David & 0.021402 \\
+electra-base-generator & ludwig & 0.048731 \\
+\bottomrule
+\end{tabular}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\centering
+\caption*{Mary has a dog. The dogs owner is called [MASK].}
+\begin{tabular}{llr}
+\toprule
+Model & Prediction & Score \\
+\midrule
+bert-base-uncased & tom & 0.024168 \\
+facebook/bart-large & . & 0.981445 \\
+albert-base-v2 & evalle & 0.283692 \\
+roberta-base & Mary & 0.044635 \\
+electra-base-generator & Mary & 0.031641 \\
+\bottomrule
+\end{tabular}
+\end{minipage}
+\end{table}
+
+Anhand dieser Lückentexte ist ersichtlich, 
+dass manche Modelle in der Lage Eigennamen zu verarbeiten und die Lücke sinnvoll verarbeiten können.
+Diese Art von Sätzen fällt in einen Teilbereich namens 'Named-entity recognition'.
+Jedoch ist auch ersichtlich, dass die Fähigkeiten der Modelle hierbei stark vom gegeben Satz abhängen 
+und den meisten Modellen diese Aufgabe eher schwerfällt.
+
+\vspace{4em}
+
+\begin{table}[ht]
+\centering
+\scriptsize
+\begin{minipage}[t]{0.48\linewidth}
+\centering
+\caption*{The candle melted all over the table. The [MASK] was ruined.}
+\begin{tabular}{llr}
+\toprule
+Model & Prediction & Score \\
+\midrule
+bert-base-uncased & table & 0.041987 \\
+facebook/bart-large & food & 0.051147 \\
+albert-base-v2 & candle & 0.518183 \\
+roberta-base & candle & 0.177422 \\
+electra-base-generator & table & 0.127574 \\
+\bottomrule
+\end{tabular}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\centering
+\caption*{The trophy doesn't fit in the shelf because it is too [MASK].}
+\begin{tabular}{llr}
+\toprule
+Model & Prediction & Score \\
+\midrule
+bert-base-uncased & heavy & 0.401578 \\
+facebook/bart-large & . & 0.906250 \\
+albert-base-v2 & tall & 0.101796 \\
+roberta-base & heavy & 0.191668 \\
+electra-base-generator & big & 0.166590 \\
+\bottomrule
+\end{tabular}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\centering
+\caption*{He couldn't reach the top shelf because he was too [MASK].}
+\begin{tabular}{llr}
+\toprule
+Model & Prediction & Score \\
+\midrule
+bert-base-uncased & weak & 0.127270 \\
+facebook/bart-large & . & 0.986328 \\
+albert-base-v2 & tired & 0.141747 \\
+roberta-base & tall & 0.685464 \\
+electra-base-generator & big & 0.180254 \\
+\bottomrule
+\end{tabular}
+\end{minipage}
+\end{table}
+Unser letztes Beispiel untersucht, ob unsere Modelle simpler Logik und Begründungen folgen können.
+Bei dem Lückentext mit der schmelzenden Kerze wird dem Modell vor dem maskierten Satz ein Satz mit den Objekten 'table' und  'candle' gegeben.
+Hier müsste das Modell schlussfolgern, dass der Tisch ruiniert durch die Kerze ruiniert wurde.
+Es sagen aber gleich viele Modelle 'table' voraus wie 'candle' und dazu sind sich die Modelle korrekt antworteten, unsicherer als alle anderen Modelle.\\
+Bei unserem Trophäensatz haben die meisten Modelle eine richtige Idee, beziehungsweise eine richtige Begründung warum die Trophähe nicht ins Regal passen könnte.
+Dennoch passen die meisten Antworten nicht richtig in die Lücke und nur ein Modell antwortete mit dem naheliegensten Wort 'big'.\\
+Die Schlussfolgerung hinter unserem letzten Beispielsatz scheinen die Modelle jedoch gar nicht zu verstehen.
+Während Wörter wie 'weak' oder 'tired' noch mit einem zugedrücktem Auge als richtig gesehen werden kann antworten zwei Modelle mit dem kompletten Gegenteil des gesuchten Wortes.
 
 \newpage
 \subsection{Verschiedene Modelle für verschiedene Themengebiete}
