@@ -140,6 +140,13 @@ Einige Beispiele hierzu wären BART, RoBERTa, ALBERT, ELECTRA, MPNet wobei hinte
 Wenn man solch einem Modell einen maskierten Text gibt, antwortet dieses mit dem Wort, das sich am wahrscheinlichsten hinter der Maske versteckt.
 \\
 Bei dem Satz "[MASK] is the capital of France." würde so ein Modell zum Beispiel das Wort "Paris" vorhersagen.
+%========
+%WIP
+%========
+\subsection{BERT Work in Progress}
+Vielleicht bissl was über BERT schreiben: https://www.ibm.com/think/topics/masked-language-model
+
+Uni-/bi- directional transformers würd mich zb interessieren idk, könnt ich machen vllt
 
 \newpage
 \section{Das Ausfüllen von Lückentexten}
@@ -785,10 +792,17 @@ Wir sehen also bei einem Großteil der Vorhersagen ist sich das Modell sehr sich
 %==========================
 %Teil 3 
 %==========================
-
+%=============================
+%5.1 Erster Versuch mit BERT
+%=============================
 \section{Korrektur von Lückentexten}
 In diesem Teil wollten wir einem Modell einen ausgefüllten Lückentext geben, damit es ihn korrigiert: Wurde der Text richtig oder falsch ausgefüllt?
-\subsection{Datenset für Korrektur}
+\subsection{Erster Versuch mit BERT}
+
+%============================
+%5.1.1 Datenset für Korrektur
+%=============================
+\subsubsection{Datenset für Korrektur}
 Zunächst wurde hier ein öffentliches Datenset "Cloze-test-with-Bert"\footnote{\label{foot:1}https://github.com/TheMaxi7/Cloze-test-with-BERT} verwendet.
 Dieses besteht aus einem Test- und einem Trainingsset, wobei das Testset 1.267 und das Trainingset 40.398 Sätze mit jeweils zwei Antwortmöglichkeiten beinhaltet.
 Eine Datei aus dem Datenset sieht z.B. so aus:
@@ -876,7 +890,10 @@ Dieser Code bringt das Datenset in eine Form, die für unsere Anwendung besser i
 
 \end{lstlisting}
 
-\subsection{Korrektur mit BERT}
+%========================
+%5.1.2 Korrektur mit BERT
+%========================
+\subsubsection{Korrektur mit BERT}
 Zuerst versuchen wir den Text mit einem vortrainierten BERT-Modell zu korrigieren. Wir machen dies, indem wir die Funktion \texttt{token\_probability} definieren, die einen Satz mit \texttt{[MASK]}-Token tokenized, die Position des \texttt{[MASK]}-Tokens findet, Logits an der Maskenposition auswählt und dann die Logits mittels Softmax in Wahrschenlichkeiten umwandelt. Das eingesetzte Wort wird von ihr auch tokenized, wobei ein ValueError ausgegeben wird, falls das Wort aus mehr als einem Token besteht, um sie später einfach überspringen zu können, da BERT nur einzelne Tokens bewerten kann. Die Funktion gibt am Ende die bedingte Wahrscheinlichkeit aus, dass das Modell den Token vom eingesetzten Wort an der Maskenposition vorhersagt.
 \\
 Danach wird für jeden Satz in jeder Zeile der jsonl-Datei mithilfe von \texttt{token\_probability} die bedingte Wahrscheinlichkeit berechnet, außer sie wird übersprungen, da das eingesetzte Wort aus mehreren Tokens besteht. Schließlich geben wir die Anzahl der verwendeten und übersprungenen Sätze an.
@@ -888,101 +905,229 @@ import json
 import torch
 import numpy as np
 from transformers import BertTokenizer, BertForMaskedLM
-import torch.nn.functional as F
+import torch.nn.functional as torchF
 
-    model_name = "bert-base-uncased"
-    tokenizer = BertTokenizer.from_pretrained(model_name)
-    model = BertForMaskedLM.from_pretrained(model_name)
-    model.eval()
+tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
+model = BertForMaskedLM.from_pretrained("bert-base-uncased")
+model.eval()
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model.to(device)
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model.to(device)
 
-    print("Running on:", device)
+print("Running on:", device)
 
-    input_file = "./trainnew.jsonl"
+input_file = "./trainnew.jsonl"
 
-    scores = []   # p(w | context)
-    labels = []   # is_correct
-    skipped = 0
-
-
-    def token_probability(masked_sentence, word):
-        inputs = tokenizer(masked_sentence, return_tensors="pt").to(device)
-
-        mask_index = torch.where(
-            inputs["input_ids"] == tokenizer.mask_token_id
-        )[1]
-
-        with torch.no_grad():
-            outputs = model(**inputs)
-            logits = outputs.logits
-
-        mask_logits = logits[0, mask_index, :]
-        probs = F.softmax(mask_logits, dim=-1)
-
-        token_ids = tokenizer.convert_tokens_to_ids(
-            tokenizer.tokenize(word)
-        )
-
-        if len(token_ids) != 1:
-            raise ValueError
-
-        return probs[0, token_ids[0]].item()
+scores = []   # p(w | context)
+labels = []   # is_correct
+skipped = 0
 
 
-    #Scores sammeln
+def token_probability(masked_sentence, word):
+    inputs = tokenizer(masked_sentence, return_tensors="pt").to(device)
 
-    with open(input_file, "r", encoding="utf-8") as fin:
-        for line in fin:
-            data = json.loads(line)
+    mask_index = torch.where(
+        inputs["input_ids"] == tokenizer.mask_token_id
+    )[1]
 
-            masked_sentence = data["unfilled_sentence"]
-            chosen_option = data["chosen_option"]
-            is_correct_label = data["is_correct"]
+    with torch.no_grad():
+        outputs = model(**inputs)
+        logits = outputs.logits
 
-            try:
-                p = token_probability(masked_sentence, chosen_option)
-            except ValueError:
-                skipped += 1
-                continue
+    mask_logits = logits[0, mask_index, :]
+    probs = torchF.softmax(mask_logits, dim=-1)
 
-            scores.append(p)
-            labels.append(is_correct_label)
+    token_ids = tokenizer.convert_tokens_to_ids(
+        tokenizer.tokenize(word)
+    )
 
-    scores = np.array(scores)
-    labels = np.array(labels)
+    if len(token_ids) != 1:
+        raise ValueError
 
-    print(f"Verwendete Samples: {len(scores)}")
-    print(Uebersprungene Samples: {skipped}")
+    return probs[0, token_ids[0]].item()
 
 
-    #Optimalen Threshold finden
+#Scores sammeln
 
-    best_acc = 0.0
-    best_threshold = 0.0
+with open(input_file, "r", encoding="utf-8") as fin:
+    for line in fin:
+        data = json.loads(line)
 
-    for t in np.linspace(scores.min(), scores.max(), 300):
-        preds = scores > t
-        acc = (preds == labels).mean()
-        if acc > best_acc:
-            best_acc = acc
-            best_threshold = t
+        masked_sentence = data["unfilled_sentence"]
+        chosen_option = data["chosen_option"]
+        is_correct_label = data["is_correct"]
 
-    print(f"Best Threshold: {best_threshold:.6f}")
-    print(f"Best Accuracy: {best_acc * 100:.2f}%")
+        try:
+            p = token_probability(masked_sentence, chosen_option)
+        except ValueError:
+            skipped += 1
+            continue
+
+        scores.append(p)
+        labels.append(is_correct_label)
+
+scores = np.array(scores)
+labels = np.array(labels)
+
+print(f"Verwendete Samples: {len(scores)}")
+print(f"Uebersprungene Samples: {skipped}")
+
+#Optimalen Threshold finden
+
+best_acc = 0.0
+best_threshold = 0.0
+threshholdcount = 1000000
+
+for t in np.linspace(scores.min(), scores.max(), threshholdcount):
+    preds = scores > t
+    acc = (preds == labels).mean()
+    if acc > best_acc:
+        best_acc = acc
+        best_threshold = t
+
+print(f"Anzahl der getesteten Thresholds: {threshholdcount}")
+print(f"Best Threshold: {best_threshold:.6f}")
+print(f"Best Accuracy: {best_acc * 100:.2f}%")
 \end{lstlisting}
- Der Code gibt auf dem "Trainingsset"  folgendes Resultat aus:
+ Der Code gibt auf dem "Trainingsset"{} folgendes Resultat aus:
 
 \begin{verbatim}
 Running on: cuda
 Verwendete Samples: 74644
 Übersprungene Samples: 6152
-Best Threshold: 0.056660
-Best Accuracy: 52.62% 
+Anzahl der getesteten Thresholds: 1000000
+Best Threshold: 0.056973
+Best Accuracy: 52.65%
 \end{verbatim}
 Man sieht, dass die Accuracy auch mit dem besten Threshold nur etwas mehr als 50\% beträgt, d.h. dass das Modell kaum besser als Raten ist. 
-\\
-Warum passiert das? 
+Das kann mehrere Gründe haben. Einerseits ist das Datenset im Nachhinein betrachtet nicht ideal für diese Aufgabe: \\Viele Sätze basieren auf Logik und ein großer Teil der eingesetzten Wörter sind Namen. Andererseits sind die bedingten Wahrscheinlichkeiten der einzelnen Wörter sehr klein, da BERT ein großes Vokabular hat. Das macht es schwer einen vernünftigen Threshhold zu finden, selbst mit hoher Anzahl von Thresholds.
+
+%================================
+%5.2 Korrektur auf CLOTH Datenset
+%=================================
+\subsection{Korrektur auf CLOTH Datenset}
+Da das vorherige Datenset nicht ideal war, versuchen wir es nun mit dem CLOTH Datenset\footnote{\label{foot:2}https://www.cs.cmu.edu/~glai1/data/cloth/}, das aus 7.131 Lückentextpassagen mit 99.433 Lücken besteht. Die Daten stammen aus Englischtests an Schulen in China.
+Jede Passage im Datenset ist eine JSON-Datei, die folgendes enthält:
+\begin{verbatim}
+article: Ein String mit mehreren Lücken, die mit _ markiert sind.
+options: Eine Liste von Listen mit vier Antwortmöglichkeiten für jede Lücke.
+answers: Eine Liste, die die richtige Antwort für jede Lücke mit "A", "B", "C" oder 
+         "D" angibt.
+source:  Eine eindeutige ID der Passage.
+\end{verbatim}
+
+Im folgenden Code laden wir 100 Passagen aus dem Validierungsset des CLOTH-Datensets. Für jede Lücke in dieser Passage setzen wir die verschiedenen Antwortmöglichkeiten ein und lassen die bedingtenScores dieser berechnen. Anschließend suchen wir wieder einen guten Threshhold, um viele richtige Vorhersagen zu bekommen.
+\begin{lstlisting}[language = python]   
+import glob
+import json
+import numpy as np
+
+letter_to_index = {"A":0, "B":1, "C":2, "D":3}
+
+def build_masked_sentence(parts, blank_index): 
+    return parts[blank_index] + " [MASK] " + parts[blank_index + 1] 
+    
+def score_option(masked_sentence, option): 
+    #return score_sentence(masked_sentence.replace("[MASK]", option))
+    
+    inputs = tokenizer(masked_sentence, return_tensors="pt") 
+    mask_index = torch.where(inputs["input_ids"][0] == tokenizer.mask_token_id)[0] 
+    with torch.no_grad(): 
+        logits = model(**inputs).logits 
+    option_id = tokenizer.convert_tokens_to_ids(option) 
+    return logits[0, mask_index, option_id].item()
+
+def predict_answers2(article, options,correct_indices):
+    parts = article.split("_")
+    test = []
+
+    for i, opts in enumerate(options):
+        masked_sentence = build_masked_sentence(parts, i)
+        #print(masked_sentence)
+        #print(list(enumerate(opts)))
+        scores = [[score_option(masked_sentence, opt), correct_indices[i]==j] for j,opt in enumerate(opts)]
+        for x in scores:
+            test.append(x)
+    return test
+
+
+all_files = glob.glob("/kaggle/input/clothdata/CLOTH/valid/middle/middle24*.json")
+total_correct = 0
+total_questions = 0
+
+results = []
+scores = []
+labels = []
+
+for file_path in all_files:
+    with open(file_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    
+    article = data["article"]
+    options = data["options"]
+    answers = data["answers"]
+
+    correct_indices = [letter_to_index[a] for a in answers]
+    
+    predicted = predict_answers2(article, options, correct_indices)
+
+    for i in predicted:
+        scores.append(i[0])
+        labels.append(i[1])
+
+scores = np.array(scores)
+labels = np.array(labels)
+
+print(f"Verwendete Samples: {len(scores)}")
+
+best_acc = 0.0
+best_threshold = 0.0
+threshholdcount = 300
+
+for t in np.linspace(scores.min(), scores.max(), threshholdcount):
+    preds = scores > t
+    acc = (preds == labels).mean()
+    if acc > best_acc:
+        best_acc = acc
+        best_threshold = t
+
+print(f"Processed {len(all_files)} files")
+print(f"Anzahl der getesteten Thresholds: {threshholdcount}")
+print(f"Best Threshold: {best_threshold:.6f}")
+print(f"Best Accuracy: {best_acc * 100:.2f}%")
+\end{lstlisting}
+Wir bekommen den Output:
+\begin{verbatim}
+Verwendete Samples: 3644
+Processed 100 files
+Anzahl der getesteten Thresholds: 300
+Best Threshold: 10.734425
+Best Accuracy: 83.70%
+\end{verbatim}
+Man sieht, es funktioniert auf diesem Datenset deutlich besser als beim Ersten. Wenn man hier raten würde, betrage die Accuracy ca. 50\% und falls man immer auf "falsch ausgefüllt"{} tippen würde 75\% . (Da wir immer alle vier Antwortmöglichkeiten eingesetzt haben, also pro Lücke jeweils immer drei falsche und eine richtige Antwort korrigiert haben.)
+
+%===================================================================================
+%5.3 Vergleich von verschiedenen Methoden zum Korrigieren von Lückentexten
+%===================================================================================
+\subsection{Vergleich von verschiedenen Methoden zum Korrigieren von Lückentexten}
+
+
+
+%==================
+%Quellenverzeichnis
+%==================
+\section{Quellenverzeichnis}
+
+
+%==================
+%Arbeitsaufteilung
+%==================
+\section{Arbeitsaufteilung}
+
+Krystian Gluc - \\
+Cristian Grigore - \\
+Dominik Berghammer - \\
+Adrian Linder - \\
+
 
 \end{document}
