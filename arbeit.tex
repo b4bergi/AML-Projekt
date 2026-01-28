@@ -133,7 +133,7 @@ Zu diesem Thema wurden dann drei verschiedene Aufgaben spezifiziert:
     \item Das Korrigieren von Lückentexten
 \end{enumerate}
 
-\section{Technologien}
+\subsection{Technologien}
 Bei einer Recherche zu diesem Thema stößt man schnell auf den Begriff Masked-Language-Models.
 Eines der bekanntesten Modelle dazu ist BERT (Bidirectional Encoder Representations from Transformers). Es gibt auch zahlreiche andere Modelle, die für Lückentexte verwendet werden können. 
 Einige Beispiele hierzu wären BART, RoBERTa, ALBERT, ELECTRA, MPNet wobei hinter vielen von diesen Modellen die BERT Architektur steckt.
@@ -143,10 +143,16 @@ Bei dem Satz "[MASK] is the capital of France." würde so ein Modell zum Beispie
 %========
 %WIP
 %========
-\subsection{BERT Work in Progress}
-Vielleicht bissl was über BERT schreiben: https://www.ibm.com/think/topics/masked-language-model
-
-Uni-/bi- directional transformers würd mich zb interessieren idk, könnt ich machen vllt
+\subsection{BERT}
+BERT ist ein von Google entwickeltes Sprachmodell. 
+Wie in \cite{turc2019} gezeigt sind \textit{Masked LM} und \textit{Next Sentence Prediction} die zwei Aufgaben die verwendet wurden, um BERT zu trainieren.
+Wobei \textit{Masked LM} genau den Fall eines Lückentextes abdeckt.
+Das Model wurde hier mit Sätzen trainiert bei denen 15 \% der Tokens des Satzes maskiert wurden.
+\\
+Vor BERT waren die meisten Sprachmodelle \textit{uni-directional}, was bedeutet das in dem Fall eines maskierten Textes nur Token vor der Lücke betrachtet werden.
+Ein bidirectionaler Encoder, wie der im Falle von BERT, betrachtet alle Token die vor und nach dem maskierten Wort stehen.
+\\
+Dadurch wird auch ermöglicht, dass das vortrainierte BERT-Modell mit nur einem zusätzlichen Outputlayer \textit{finetuned} werden kann.
 
 \newpage
 \section{Das Ausfüllen von Lückentexten}
@@ -898,7 +904,7 @@ Zuerst versuchen wir den Text mit einem vortrainierten BERT-Modell zu korrigiere
 \\
 Danach wird für jeden Satz in jeder Zeile der jsonl-Datei mithilfe von \texttt{token\_probability} die bedingte Wahrscheinlichkeit berechnet, außer sie wird übersprungen, da das eingesetzte Wort aus mehreren Tokens besteht. Schließlich geben wir die Anzahl der verwendeten und übersprungenen Sätze an.
 \\
-Um einen guten Threshold zu finden, ab welcher Wahrscheinlichkeit wir sagen, dass der Satz korrekt ausgefüllt wurde, nehmen wir 300 Werte zwischen dem kleinster und größter Wahrscheinlichkeit. Für jeden dieser Wahrscheinlichkeitswerte schauen wir uns an welche Wörter eine höhere Wahrscheinlichkeit haben und überprüfen wie viele davon korrekt sind. Der Threshold mit den meisten richtigen Vorhersagen wird als bester Threshold ausgegeben, zusammen mit der Accuracy unter diesem Threshhold.
+Um einen guten Threshold zu finden, ab welcher Wahrscheinlichkeit wir sagen, dass der Satz korrekt ausgefüllt wurde, nehmen wir 300 Werte zwischen der kleinsten und größten Wahrscheinlichkeit. Für jeden dieser Wahrscheinlichkeitswerte schauen wir uns an welche Wörter eine höhere Wahrscheinlichkeit haben und überprüfen wie viele davon korrekt sind. Der Threshold mit den meisten richtigen Vorhersagen wird als bester Threshold ausgegeben, zusammen mit der Accuracy unter diesem Threshhold.
 
 \begin{lstlisting}[language = python]   
 import json
@@ -1112,22 +1118,23 @@ Man sieht, es funktioniert auf diesem Datenset deutlich besser als beim Ersten. 
 \subsection{Vergleich von verschiedenen Methoden zum Korrigieren von Lückentexten}
 
 
-
-%==================
-%Quellenverzeichnis
-%==================
-\section{Quellenverzeichnis}
-
-
+\newpage
 %==================
 %Arbeitsaufteilung
 %==================
-\section{Arbeitsaufteilung}
+\section*{Arbeitsaufteilung}
 
-Krystian Gluc - \\
-Cristian Grigore - \\
-Dominik Berghammer - \\
-Adrian Linder - \\
+\begin{description}
+  \item[\textbf{Krystian Gluc}] Abschnitt 4 - Korrektur von Lückentexten
+  \item[\textbf{Cristian Grigore}] Abschnitt 2.3 - Verschiedene Modelle für verschiedene Themengebiete
+  \item[\textbf{Dominik Berghammer}] Abschnitt 1.1-2.2 - Initiale Evaluierung der drei Themengebiete
+  \item[\textbf{Adrian Linder}] Abschnitt 2 - Finetuning von BERT
+\end{description}
+
+
+
+\bibliographystyle{plain} 
+\bibliography{references}
 
 
 \end{document}
