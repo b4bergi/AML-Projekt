@@ -1,5 +1,10 @@
 \begin{thebibliography}{1}
 
+\bibitem{transformersDocs}
+Transformers Dokumentation.
+\newblock \url{https://huggingface.co/docs/transformers/v5.0.0/en/index}.
+\newblock Aufgerufen 30.01.2026.
+
 \bibitem{turc2019}
 Iulia Turc, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova.
 \newblock Well-read students learn better: On the importance of pre-training compact models.
