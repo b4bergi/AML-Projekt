@@ -804,6 +804,28 @@ Generell lässt sich die Wahrscheinlichkeit(Confidence) im folgenden Diagramm da
 \end{figure}
 Wir sehen also bei einem Großteil der Vorhersagen ist sich das Modell sehr sicher. 86 von 98 Vorhersagen haben eine Sicherheit von mehr als 95 \% und lediglich 5 eine kleiner als 80 \%. Dennoch sehen wir das Modell ist vor allem bei Fragen etwas unsicher. Somit wäre ein Training mit etwas mehr Fragen sicherlich hilfreich um die Sicherheit weiter zu stärken.
 
+\subsection{Informationsverlust}
+Wir wollen uns nun zum Abschluss dieses Kapitels noch anschauen, was eigentlich der TradeOff unseres Trainings war. Dazu Vergleichen wir die Performance des Finetune Modells mit dem Originalmodell. Wir nutzen dazu dieselben Beispiele wie in Kapitel 2. \\
+\begin{center}
+\begin{tabular}{l cc cc cc cc cc}
+& \multicolumn{2}{c}{Children}
+& \multicolumn{2}{c}{Wikipedia}
+& \multicolumn{2}{c}{German}
+& \multicolumn{2}{c}{Popular Books}
+& \multicolumn{2}{c}{Long Texts} \\
+\cmidrule(lr){2-3}
+\cmidrule(lr){4-5}
+\cmidrule(lr){6-7}
+\cmidrule(lr){8-9}
+\cmidrule(lr){10-11}
+& T1 & T5 & T1 & T5 & T1 & T5 & T1 & T5 & T1 & T5 \\
+\midrule
+BERT & 4/10 & 6/10 & 6/10 & 7/10 & 0/10 & 0/10 & 3/10 & 4/10 & 2/10 & 4/10  \\
+FINETUNE            & 2/10 & 2/10 & 2/10 & 2/10 & 0/10 & 0/10 & 0/10 & 0/10 & 0/10 & 0/10  \\
+\end{tabular}
+\end{center}
+Wir sehen also wir haben extrem an Informationen verloren durch das Training. Dieses Modell wäre als General Purpose Modell komplett ungeeignet nun.
+
 %==========================
 %Teil 3 
 %==========================
