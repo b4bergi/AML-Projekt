@@ -1,5 +1,11 @@
 \begin{thebibliography}{1}
 
+\bibitem{Cloze}
+Davide~''TheMaxi7'' Altamura.
+\newblock Cloze-test-with-bert dataset.
+\newblock \url{https://github.com/TheMaxi7/Cloze-test-with-BERT}.
+\newblock Aufgerufen am 03.02.2026.
+
 \bibitem{transformersDocs}
 Transformers Dokumentation.
 \newblock \url{https://huggingface.co/docs/transformers/v5.0.0/en/index}.
@@ -9,5 +15,16 @@ Transformers Dokumentation.
 Iulia Turc, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova.
 \newblock Well-read students learn better: On the importance of pre-training compact models.
 \newblock {\em arXiv preprint arXiv:1908.08962v2}, 2019.
+
+\bibitem{CLOTH}
+Qizhe Xie, Guokun Lai, Zihang Dai, and Eduard Hovy.
+\newblock Cloth dataset.
+\newblock \url{https://www.cs.cmu.edu/~glai1/data/cloth/}.
+\newblock Aufgerufen am 03.02.2026.
+
+\bibitem{CLOTH_paper}
+Qizhe Xie, Guokun Lai, Zihang Dai, and Eduard Hovy.
+\newblock Large-scale cloze test dataset created by teachers.
+\newblock {\em arXiv preprint arXiv:1711.03225}, 2018.
 
 \end{thebibliography}

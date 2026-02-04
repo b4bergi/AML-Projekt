@@ -23,6 +23,8 @@
 \usepackage{tabularx}
 \usepackage{booktabs}
 \usepackage{caption}
+\usepackage{subfigure}
+\usepackage{url}
 
 \pagestyle{myheadings}                          % Own header
 \pagestyle{fancy}                               % Own style
@@ -840,7 +842,7 @@ In diesem Teil wollten wir einem Modell einen ausgefüllten Lückentext geben, d
 %5.1.1 Datenset für Korrektur
 %=============================
 \subsubsection{Datenset für Korrektur}
-Zunächst wurde hier ein öffentliches Datenset "Cloze-test-with-Bert"\footnote{\label{foot:1}https://github.com/TheMaxi7/Cloze-test-with-BERT} verwendet.
+Zunächst wurde hier ein öffentliches Datenset "Cloze-test-with-Bert"\cite{Cloze} verwendet.
 Dieses besteht aus einem Test- und einem Trainingsset, wobei das Testset 1.267 und das Trainingset 40.398 Sätze mit jeweils zwei Antwortmöglichkeiten beinhaltet.
 Eine Datei aus dem Datenset sieht z.B. so aus:
 \\
@@ -1038,12 +1040,42 @@ Best Accuracy: 52.65%
 \end{verbatim}
 Man sieht, dass die Accuracy auch mit dem besten Threshold nur etwas mehr als 50\% beträgt, d.h. dass das Modell kaum besser als Raten ist. 
 Das kann mehrere Gründe haben. Einerseits ist das Datenset im Nachhinein betrachtet nicht ideal für diese Aufgabe: \\Viele Sätze basieren auf Logik und ein großer Teil der eingesetzten Wörter sind Namen. Andererseits sind die bedingten Wahrscheinlichkeiten der einzelnen Wörter sehr klein, da BERT ein großes Vokabular hat. Das macht es schwer einen vernünftigen Threshhold zu finden, selbst mit hoher Anzahl von Thresholds.
+\\ \\
+Im oberen Code benutzen wir Softmax, um die Scores von BERT in Wahrscheinlichkeiten umzuwandeln. Theoretisch sollte es jedoch kaum einen Unterschied machen, ob wir direkt mit den Scores von Bert oder mit den Wahrscheinlichkeiten arbeiten: Das einzige was sich vielleicht etwas ändern könnte ist die Verteilung unserer zu testenden Threshholds relativ zu den Scores/Wahrscheinlichkeiten. (Wir definieren diese ja in einem Bereich zwischen dem kleinsten und größten Score/Wahrscheinlichkeit). Vollständigkeitshalber haben wir es trotzdem auch ohne Softmax probiert, um zu schauen ob es tatsächlich keinen nennenswerten Unterschied macht. Mit einem etwas abgeänderten Code bekommen wir den Output:
+\begin{verbatim}
+Running on: cuda
+Verwendete Samples: 74644
+Übersprungene Samples: 6152
+Score-Bereich: -6.3039 bis 18.2784
+Anzahl der getesteten Thresholds: 1000000
+Best Threshold: 8.630987
+Best Accuracy: 52.55%
+\end{verbatim}
+Es macht also wie erwartet kaum einen Unterschied, weshalb wir im Folgenden Kapitel die Softmax weglassen und direkt mit den Scores arbeiten.
+\\ \\
+Letztlich berechnen wir noch den F1-Score, testen den besten F1-Threshhold und plotten die ROC- und Precision-Recall Curve mit Scikit-learn:
+\begin{verbatim}
+Best Threshold (F1): -5.665081024169922
+Best F1: 0.6666845292662575
+Precision: 0.5000200961937808
+Recall: 1.0
+Accuracy at F1-threshold: 50.00%
+\end{verbatim}
+\begin{figure}[H]
+    \hfill
+    \subfigure[]{\includegraphics[width=0.49\textwidth]{roccurvecloze.png}}
+    \hfill
+    \subfigure[]{\includegraphics[width=0.49\textwidth]{precreccloze.png}}
+    \hfill
+    \caption{ROC Curve (a) und Precision-Recall Curve (b) auf Cloze-test-with-Bert Datenset}
+\end{figure}
 
+Hier sieht man schön, dass das Modell kaum besser als Raten ist. Die AUC der ROC und Precision-Recall Curve betragen beide ca. 0.53, d.h. nur minimal besser als 0.5, was Raten entspricht.
 %================================
 %5.2 Korrektur auf CLOTH Datenset
 %=================================
 \subsection{Korrektur auf CLOTH Datenset}
-Da das vorherige Datenset nicht ideal war, versuchen wir es nun mit dem CLOTH Datenset\footnote{\label{foot:2}https://www.cs.cmu.edu/~glai1/data/cloth/}, das aus 7.131 Lückentextpassagen mit 99.433 Lücken besteht. Die Daten stammen aus Englischtests an Schulen in China.
+Da das vorherige Datenset nicht ideal war, versuchen wir es nun mit dem CLOTH Datenset\cite{CLOTH}\cite{CLOTH_paper}, das aus 7.131 Lückentextpassagen mit 99.433 Lücken besteht. Die Daten stammen aus Englischtests an Schulen in China.
 Jede Passage im Datenset ist eine JSON-Datei, die folgendes enthält:
 \begin{verbatim}
 article: Ein String mit mehreren Lücken, die mit _ markiert sind.
@@ -1053,44 +1085,58 @@ answers: Eine Liste, die die richtige Antwort für jede Lücke mit "A", "B", "C"
 source:  Eine eindeutige ID der Passage.
 \end{verbatim}
 
-Im folgenden Code laden wir 100 Passagen aus dem Validierungsset des CLOTH-Datensets. Für jede Lücke in dieser Passage setzen wir die verschiedenen Antwortmöglichkeiten ein und lassen die bedingtenScores dieser berechnen. Anschließend suchen wir wieder einen guten Threshhold, um viele richtige Vorhersagen zu bekommen.
+
+Im folgenden Code laden wir 100 Passagen aus dem Validierungsset des CLOTH-Datensets. Für jede Lücke in dieser Passage setzen wir die verschiedenen Antwortmöglichkeiten ein und lassen die  Scores dieser berechnen. Anschließend suchen wir wieder einen guten Threshhold, um viele richtige Vorhersagen zu bekommen.
+
 \begin{lstlisting}[language = python]   
 import glob
 import json
 import numpy as np
+import torch
 
 letter_to_index = {"A":0, "B":1, "C":2, "D":3}
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print("Running on:", device)
+
+model.to(device)
+model.eval()
 
 def build_masked_sentence(parts, blank_index): 
     return parts[blank_index] + " [MASK] " + parts[blank_index + 1] 
     
 def score_option(masked_sentence, option): 
-    #return score_sentence(masked_sentence.replace("[MASK]", option))
-    
-    inputs = tokenizer(masked_sentence, return_tensors="pt") 
-    mask_index = torch.where(inputs["input_ids"][0] == tokenizer.mask_token_id)[0] 
+    inputs = tokenizer(masked_sentence, return_tensors="pt")
+    inputs = {k: v.to(device) for k, v in inputs.items()}
+
+    mask_index = torch.where(inputs["input_ids"][0] == tokenizer.mask_token_id)[0]
+
     with torch.no_grad(): 
         logits = model(**inputs).logits 
-    option_id = tokenizer.convert_tokens_to_ids(option) 
+
+    option_id = tokenizer.convert_tokens_to_ids(option)
+    
     return logits[0, mask_index, option_id].item()
 
-def predict_answers2(article, options,correct_indices):
+def predict_answers2(article, options, correct_indices):
     parts = article.split("_")
     test = []
 
     for i, opts in enumerate(options):
         masked_sentence = build_masked_sentence(parts, i)
-        #print(masked_sentence)
-        #print(list(enumerate(opts)))
-        scores = [[score_option(masked_sentence, opt), correct_indices[i]==j] for j,opt in enumerate(opts)]
+
+        scores = [
+            [score_option(masked_sentence, opt), correct_indices[i] == j]
+            for j, opt in enumerate(opts)
+        ]
+
         for x in scores:
             test.append(x)
+
     return test
 
 
-all_files = glob.glob("/kaggle/input/clothdata/CLOTH/valid/middle/middle24*.json")
-total_correct = 0
-total_questions = 0
+all_files = glob.glob("./CLOTH/train/middle/middle*.json")
 
 results = []
 scores = []
@@ -1135,19 +1181,47 @@ print(f"Best Accuracy: {best_acc * 100:.2f}%")
 \end{lstlisting}
 Wir bekommen den Output:
 \begin{verbatim}
-Verwendete Samples: 3644
-Processed 100 files
+Running on: cuda
+Verwendete Samples: 88224
+Processed 2341 files
 Anzahl der getesteten Thresholds: 300
-Best Threshold: 10.734425
-Best Accuracy: 83.70%
+Best Threshold: 11.141194
+Best Accuracy: 82.85%
 \end{verbatim}
 Man sieht, es funktioniert auf diesem Datenset deutlich besser als beim Ersten. Wenn man hier raten würde, betrage die Accuracy ca. 50\% und falls man immer auf "falsch ausgefüllt"{} tippen würde 75\% . (Da wir immer alle vier Antwortmöglichkeiten eingesetzt haben, also pro Lücke jeweils immer drei falsche und eine richtige Antwort korrigiert haben.)
+\\
+Wenn wir den Threshholdcount auf z.B. 1.000.000 setzen, verbessert sich die Accuracy nur wenig:
+\begin{verbatim}
+Processed 2341 files
+Anzahl der getesteten Thresholds: 1000000
+Best Threshold: 11.226575
+Best Accuracy: 82.87%
+\end{verbatim}
 
-%===================================================================================
-%5.3 Vergleich von verschiedenen Methoden zum Korrigieren von Lückentexten
-%===================================================================================
-\subsection{Vergleich von verschiedenen Methoden zum Korrigieren von Lückentexten}
+Wir können die ROC Curve und die Precision-Recall Curve wieder mithilfe von Scikit-learn relativ schnell plotten:
 
+\begin{figure}[H]
+    \hfill
+    \subfigure[]{\includegraphics[width=0.49\textwidth]{roccurve.png}}
+    \hfill
+    \subfigure[]{\includegraphics[width=0.49\textwidth]{precrec.png}}
+    \hfill
+    \caption{ROC Curve (a) und Precision-Recall Curve (b) auf CLOTH Datenset}
+\end{figure}
+
+Man sieht direkt an der ROC Curve, dass das Modell besser als Raten abschneidet. Die AUC der ROC Curve beträgt ca. 0.8 und die AUC der Precision-Recall Curve ca. 0.67.
+Bezüglich des F1-Scores bekommen wir hier folgenden besten Threshold und die dazugehörigen Werte:
+
+\begin{verbatim}
+Best Threshold (F1): 9.230154991149902
+Best F1: 0.6192855572476496
+Precision: 0.5993467379316196
+Recall: 0.6405966630395358
+Accuracy at F1-threshold: 80.31%
+Processed 2341 files
+\end{verbatim}
+
+Die Accuracy unter diesem F1-Threshhold ist etwas schlechter als die beste Accuracy, die wir vorhin gefunden haben, aber immer noch besser als Raten oder alles als Falsch beurteilen. 
 
 \newpage
 %==================
@@ -1165,7 +1239,7 @@ Man sieht, es funktioniert auf diesem Datenset deutlich besser als beim Ersten. 
 
 
 \bibliographystyle{plain} 
-\bibliography{references}
+\bibliography{references.bib}
 
 
 \end{document}
