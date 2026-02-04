@@ -11,6 +11,12 @@ Transformers Dokumentation.
 \newblock \url{https://huggingface.co/docs/transformers/v5.0.0/en/index}.
 \newblock Aufgerufen 30.01.2026.
 
+\bibitem{IBM_MLM}
+Eda~Kavlakoglu Jacob~Murel.
+\newblock What are masked language models?
+\newblock \url{https://www.ibm.com/think/topics/masked-language-model}.
+\newblock Aufgerufen am 28.01.2026.
+
 \bibitem{turc2019}
 Iulia Turc, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova.
 \newblock Well-read students learn better: On the importance of pre-training compact models.

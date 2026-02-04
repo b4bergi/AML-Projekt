@@ -152,7 +152,7 @@ Wobei \textit{Masked LM} genau den Fall eines Lückentextes abdeckt.
 Das Model wurde hier mit Sätzen trainiert bei denen 15 \% der Tokens des Satzes maskiert wurden.
 \\
 Vor BERT waren die meisten Sprachmodelle \textit{uni-directional}, was bedeutet das in dem Fall eines maskierten Textes nur Token vor der Lücke betrachtet werden.
-Ein bidirectionaler Encoder, wie der im Falle von BERT, betrachtet alle Token die vor und nach dem maskierten Wort stehen.
+Ein bidirectionaler Encoder, wie der im Falle von BERT, betrachtet alle Token die vor und nach dem maskierten Wort stehen. \cite{IBM_MLM}
 \\
 Dadurch wird auch ermöglicht, dass das vortrainierte BERT-Modell mit nur einem zusätzlichen Outputlayer \textit{finetuned} werden kann.
 
