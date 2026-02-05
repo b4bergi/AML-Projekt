@@ -127,6 +127,7 @@
 
 \newpage
 \section{Thema}
+\label{sec:intro}
 Nach unserem ersten Versuch allgemeiner angelegte Methoden zur Textgenerierung zu bewerten und von Scratch zu trainieren, haben wir uns auf eine spezifischere Aufgabe fokussiert: Masked-Language-Models und Lückentexte.
 Zu diesem Thema wurden dann drei verschiedene Aufgaben spezifiziert:
 \begin{enumerate}
@@ -207,12 +208,13 @@ Das Modell schlägt uns also den folgenden ausgefüllten Lückentext vor:\\
 \textit{Plants create \textbf{energy} through a process \textbf{known} as photosynthesis.}
 
 \newpage
-\subsection{Interessante Beobachtungen}
+\subsection{Interessante Beobachtungen und Limitationen}
+\label{sub:observations}
 Bei der Erprobung der verschiedenen Modelle
 kamen einige interessante Verhaltensweisen ans Licht.
 Einige der hier angeführten Beispiele zeigen Limitationen auf.
 Den fünf verschiedenen Modellen wurde hierbei jeweils ein etwas komplexerer Text
-mit genau einer Lücke gegeben, um zu beobachten wie sich das Modell dabei verhält.
+mit genau einer Lücke gegeben, um zu beobachten, wie sich das Modell dabei verhält.
 Eine der ersten Auffälligkeiten kommt von 'bart-large', 
 da dieses immer mit einem Punkt antwortet, 
 wenn der maskierte Token das letzte Wort des Satzes ist.
@@ -410,6 +412,7 @@ Während Wörter wie 'weak' oder 'tired' mit viel Spielraum als richtig bewertet
 
 \newpage
 \subsection{Verschiedene Modelle für verschiedene Themengebiete}
+\label{sub:model_comparison}
 
 \subsubsection{Einleitung} 
 In diesem Kapitel wird untersucht, wie gut verschiedene moderne Sprachmodelle mit unterschiedlichen Arten von Texten umgehen können.
@@ -537,6 +540,7 @@ Die konstant überlegene Leistung der menschlichen Referenz unterstreicht, dass 
 %===========
 \newpage
 \section{Finetune Beispiel mit BERT}
+\label{sec:finetune}
 Im folgenden Kapitel werden wir uns nun mit einem Anwendungsbeispiel beschäftigen, welches ein BERT Model nutzt, um Informationen für Nutzer bereitzustellen.
 \medskip \\
 Wir wollen nun BERT nutzen, um einem Benutzer die Möglichkeit zu geben durch natürliche Fragen Informationen über eine fiktive Firma zu erhalten. Daher betrachten wir nun einmal unser Trainingsset\footnote{Das Datenset und der Code wurde teils mittels ChatGPT erstellt und anschließend von menschlicher Hand korrigiert}
@@ -649,7 +653,7 @@ Das Training wird lokal mittels PyTorch und Transformers durchgeführt. Der genu
         \hline
         RAM & 32 GB - DDR5 4800 MT/s \\
         \hline
-        Betriebsystem & Arch Linux - Kernel 6.18.2 \\ 
+        Betriebssystem & Arch Linux - Kernel 6.18.2 \\ 
         \hline
         CUDA & 12.6\\
         \hline
@@ -835,6 +839,7 @@ Wir sehen also wir haben extrem an Informationen verloren durch das Training. Di
 %5.1 Erster Versuch mit BERT
 %=============================
 \section{Korrektur von Lückentexten}
+\label{sec:correction}
 In diesem Teil wollten wir einem Modell einen ausgefüllten Lückentext geben, damit es ihn korrigiert: Wurde der Text richtig oder falsch ausgefüllt?
 \subsection{Erster Versuch mit BERT}
 
@@ -859,7 +864,7 @@ Eine Datei aus dem Datenset sieht z.B. so aus:
     "answer": "1"
     }
 \end{lstlisting}
-
+\noindent
 Um das Datenset gut benutzen zu können haben wir es mithilfe Python transformiert:
 \\
 
@@ -1069,7 +1074,7 @@ Accuracy at F1-threshold: 50.00%
     \hfill
     \caption{ROC Curve (a) und Precision-Recall Curve (b) auf Cloze-test-with-Bert Datenset}
 \end{figure}
-
+\noindent
 Hier sieht man schön, dass das Modell kaum besser als Raten ist. Die AUC der ROC und Precision-Recall Curve betragen beide ca. 0.53, d.h. nur minimal besser als 0.5, was Raten entspricht. \cite{ROCPRCAUC}
 Für das Cloze-test-with-Bert Datenset scheint unser Ansatz etwas zu naiv zu sein. Unsere Vermutung ist, dass die Scores von BERT zu nah beieinander liegen, um einen guten Threshold zu finden, da die Sätze sehr viel auf Logik basieren und BERT hier nicht so gut mit dem Satzkontext arbeiten kann: Kontextmäßig scheinen beide Antwortmöglichkeiten plausibel (in fast allen Sätzen kommen beide Antwortmöglichkeiten bereits vor der Lücke vor).  
 \\ \\
@@ -1087,8 +1092,7 @@ answers: Eine Liste, die die richtige Antwort für jede Lücke mit "A", "B", "C"
          "D" angibt.
 source:  Eine eindeutige ID der Passage.
 \end{verbatim}
-
-
+\noindent
 Im folgenden Code laden wir 100 Passagen aus dem Validierungsset des CLOTH-Datensets. Für jede Lücke in dieser Passage setzen wir die verschiedenen Antwortmöglichkeiten ein und lassen die Scores dieser berechnen. Anschließend suchen wir wieder einen guten Threshold, um viele richtige Vorhersagen zu bekommen.
 
 \begin{lstlisting}[language = python]   
@@ -1200,7 +1204,7 @@ Anzahl der getesteten Thresholds: 1000000
 Best Threshold: 11.226575
 Best Accuracy: 82.87%
 \end{verbatim}
-
+\noindent
 Wir können die ROC Curve und die Precision-Recall Curve wieder mithilfe von Scikit-learn relativ schnell plotten:
 
 \begin{figure}[H]
@@ -1211,7 +1215,7 @@ Wir können die ROC Curve und die Precision-Recall Curve wieder mithilfe von Sci
     \hfill
     \caption{ROC Curve (a) und Precision-Recall Curve (b) auf CLOTH Datenset}
 \end{figure}
-
+\noindent
 Man sieht direkt an der ROC Curve, dass das Modell besser als Raten abschneidet. Die AUC der ROC Curve beträgt ca. 0.8 und die AUC der Precision-Recall Curve ca. 0.67. Raten würde hier eine ROC AUC von ca. 0.5 und eine Precision-Recall AUC von ca. 0.25 liefern. Da die Precision-Recall AUC bei zufälligem Classifier dem Anteil der positiven Samples entspricht, also hier ca. 25\% (da wir ja immer drei falsche und eine richtige Antwort pro Lücke haben). \cite{ROCPRCAUC}
 \\
 Bezüglich des F1-Scores bekommen wir hier folgenden besten Threshold und die dazugehörigen Werte:
@@ -1224,15 +1228,15 @@ Recall: 0.6405966630395358
 Accuracy at F1-threshold: 80.31%
 Processed 2341 files
 \end{verbatim}
-
+\noindent
 Die Accuracy unter diesem F1-Threshold ist etwas schlechter als die beste Accuracy, die wir vorhin gefunden haben, aber immer noch besser als Raten oder alles als Falsch beurteilen. Es ergibt natürlich Sinn, dass die Accuracy hier etwas schlechter ausfällt, da wir den Threshold so gewählt haben, dass der F1-Score maximiert wird und nicht die Accuracy.
 \\
-Insgesamt funktioniert unser Ansatz also auf dem CLOTH-Datenset deutlich besser als auf dem Cloze-test-with-Bert Datenset. Wenn wir einen Auschnitt einer Passage aus dem CLOTH-Datenset betrachten, sehen wir vielleicht warum:
+Insgesamt funktioniert unser Ansatz also auf dem CLOTH-Datenset deutlich besser als auf dem Cloze-test-with-Bert Datenset. Wenn wir einen Ausschnitt einer Passage aus dem CLOTH-Datenset betrachten, sehen wir vielleicht warum:
 
 \begin{verbatim}
     "Mr Black works in a hospital . As a good  _  , the people in the town like him. ..."
 \end{verbatim}
-
+\noindent
 Hier werden diese vier Wörter eingesetzt und von unserem Code "überprüft" : 
 \begin{verbatim}
     "doctor", 
@@ -1247,12 +1251,18 @@ Hier ist es relativ klar, dass ''doctor'' die richtige Antwort ist, da ''hospita
 %==================
 \section*{Arbeitsaufteilung}
 
-\begin{description}
-  \item[\textbf{Krystian Gluc}] Abschnitt 4 - Korrektur von Lückentexten
-  \item[\textbf{Cristian Grigore}] Abschnitt 2.3 - Verschiedene Modelle für verschiedene Themengebiete
-  \item[\textbf{Dominik Berghammer}] Abschnitt 1.1-2.2 - Initiale Evaluierung der drei Themengebiete
-  \item[\textbf{Adrian Linder}] Abschnitt 3 - Finetuning von BERT
-\end{description}
+\begin{table}[h!]
+\centering
+\begin{tabular}{|l|p{6cm}|p{5cm}|}
+\hline
+\textbf{Name} & \textbf{Beiträge zum Projekt} & \textbf{Verfasste Abschnitte} \\ \hline
+\textbf{Krystian Gluc} & Korrektur von Lückentexten & ~\ref{sec:correction} \\ \hline
+\textbf{Cristian Grigore} & Verschiedene Modelle für verschiedene Themengebiete & ~\ref{sub:model_comparison} \\ \hline
+\textbf{Dominik Berghammer} & Konzeption und technische Voruntersuchung der Projektaufgaben (~\ref{sec:intro}), Mithilfe bei der Programmierung & ~\ref{sec:intro}-~\ref{sub:observations} \\ \hline
+\textbf{Adrian Linder} & Finetuning von BERT & ~\ref{sec:finetune} \\ \hline
+\end{tabular}
+\caption{Arbeitsaufteilung im Projekt und Protokoll}
+\end{table}
 
 
 
