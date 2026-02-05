@@ -159,7 +159,7 @@ Dadurch wird auch ermöglicht, dass das vortrainierte BERT-Modell mit nur einem 
 \newpage
 \section{Das Ausfüllen von Lückentexten}
 \subsection{Einfaches Ausfüllen mithilfe von BERT}
-Eine der einfachsten Möglichkeiten, einen Lückentext automatisch auszufüllen, ist die Verwendung von BERT über die \textit{transformers}-Bibliothek.
+Eine der einfachsten Möglichkeiten, einen Lückentext automatisch auszufüllen, ist die Verwendung von BERT über die \textit{transformers}-Bibliothek.\cite{transformersLib}
 \begin{lstlisting}[language = python]
 from transformers import pipeline
 
@@ -518,7 +518,7 @@ Die Ergebnisse in der Tabelle zeigen deutliche Leistungsunterschiede zwischen de
 Insgesamt schneiden alle Modelle bei kurzen, englischen Texten - insbesondere bei Wikipedia-Artikeln und Kinderbüchersitzen- deutlich besser ab als bei längeren Texten oder bei deutschsprachigen Inhalten. 
 Dies deutet darauf hin, dass sowohl Textstruktur als auch Sprachraum einen starken Einfluss auf die Vorhersagequalität haben. 
 RoBERT und MPNet erzielen in mehreren Kategorien die besten Ergebnisse, insbesondere bei englischen Texten.
-Dies lässt sich von allem durch ihre größere und diversere Vortrainingsdatenmenge sowie durch optimierte Trainingsstrategien erklären. 
+Dies lässt sich von allem durch ihre größere und diversere Trainingsdaten sowie durch optimierte Trainingsstrategien erklären. 
 BERT zeigt insgesamt stabile, aber meist etwas schwächere Leistungen, während ALBERT in fast allen Szenarien deutlich hinter den anderen Modellen zurückbleibt, was vermutlich auf seine stärkere komprimierte Modellarchitektur zurückzuführen ist. 
 Ein besonders auffälliges Ergebnis ist die sehr schwache Performance der meisten Modelle auf deutschen Texten. 
 Ursache hierfür sind unter anderem die komplexe Morphologie des Deutschen, häufige Komposita sowie Tokenisierungsprobleme, die dazu führen, dass viele Wörter nicht als einzelne sinnvolle Einheiten verarbeitet werden können.
@@ -826,7 +826,7 @@ BERT & 4/10 & 6/10 & 6/10 & 7/10 & 0/10 & 0/10 & 3/10 & 4/10 & 2/10 & 4/10  \\
 FINETUNE            & 2/10 & 2/10 & 2/10 & 2/10 & 0/10 & 0/10 & 0/10 & 0/10 & 0/10 & 0/10  \\
 \end{tabular}
 \end{center}
-Wir sehen also wir haben extrem an Informationen verloren durch das Training. Dieses Modell wäre als General Purpose Modell komplett ungeeignet nun.
+Wir sehen also wir haben extrem an Informationen verloren durch das Training. Dieses Modell wäre als General Purpose Modell nun komplett ungeeignet.
 
 %==========================
 %Teil 3 
@@ -937,7 +937,7 @@ Zuerst versuchen wir den Text mit einem vortrainierten BERT-Modell zu korrigiere
 \\
 Danach wird für jeden Satz in jeder Zeile der json-Datei mithilfe von \texttt{token\_probability} die bedingte Wahrscheinlichkeit berechnet, außer sie wird übersprungen, da das eingesetzte Wort aus mehreren Tokens besteht. Schließlich geben wir die Anzahl der verwendeten und übersprungenen Sätze an.
 \\
-Um einen guten Threshold zu finden, ab welcher Wahrscheinlichkeit wir sagen, dass der Satz korrekt ausgefüllt wurde, nehmen wir 300 Werte zwischen der kleinsten und größten Wahrscheinlichkeit. Für jeden dieser Wahrscheinlichkeitswerte schauen wir uns an welche Wörter eine höhere Wahrscheinlichkeit haben und überprüfen wie viele davon korrekt sind. Der Threshold mit den meisten richtigen Vorhersagen wird als bester Threshold ausgegeben, zusammen mit der Accuracy unter diesem Threshhold.
+Um einen guten Threshold zu finden, ab welcher Wahrscheinlichkeit wir sagen, dass der Satz korrekt ausgefüllt wurde, nehmen wir 300 Werte zwischen der kleinsten und größten Wahrscheinlichkeit. Für jeden dieser Wahrscheinlichkeitswerte schauen wir uns an welche Wörter eine höhere Wahrscheinlichkeit haben und überprüfen wie viele davon korrekt sind. Der Threshold mit den meisten richtigen Vorhersagen wird als bester Threshold ausgegeben, zusammen mit der Accuracy unter diesem Threshold.
 
 \begin{lstlisting}[language = python]   
 import json
@@ -1015,16 +1015,16 @@ print(f"Uebersprungene Samples: {skipped}")
 
 best_acc = 0.0
 best_threshold = 0.0
-threshholdcount = 1000000
+Thresholdcount = 1000000
 
-for t in np.linspace(scores.min(), scores.max(), threshholdcount):
+for t in np.linspace(scores.min(), scores.max(), Thresholdcount):
     preds = scores > t
     acc = (preds == labels).mean()
     if acc > best_acc:
         best_acc = acc
         best_threshold = t
 
-print(f"Anzahl der getesteten Thresholds: {threshholdcount}")
+print(f"Anzahl der getesteten Thresholds: {Thresholdcount}")
 print(f"Best Threshold: {best_threshold:.6f}")
 print(f"Best Accuracy: {best_acc * 100:.2f}%")
 \end{lstlisting}
@@ -1039,9 +1039,9 @@ Best Threshold: 0.056973
 Best Accuracy: 52.65%
 \end{verbatim}
 Man sieht, dass die Accuracy auch mit dem besten Threshold nur etwas mehr als 50\% beträgt, d.h. dass das Modell kaum besser als Raten ist. 
-Das kann mehrere Gründe haben. Einerseits ist das Datenset im Nachhinein betrachtet nicht ideal für diese Aufgabe: \\Viele Sätze basieren auf Logik und ein großer Teil der eingesetzten Wörter sind Namen. Andererseits sind die bedingten Wahrscheinlichkeiten der einzelnen Wörter sehr klein, da BERT ein großes Vokabular hat. Das macht es schwer einen vernünftigen Threshhold zu finden, selbst mit hoher Anzahl von Thresholds.
+Das kann mehrere Gründe haben. Einerseits ist das Datenset im Nachhinein betrachtet nicht ideal für diese Aufgabe: \\Viele Sätze basieren auf Logik und ein großer Teil der eingesetzten Wörter sind Namen. Andererseits sind die bedingten Wahrscheinlichkeiten der einzelnen Wörter sehr klein, da BERT ein großes Vokabular hat. Das macht es schwer einen vernünftigen Threshold zu finden, selbst mit hoher Anzahl von Thresholds.
 \\ \\
-Im oberen Code benutzen wir Softmax, um die Scores von BERT in Wahrscheinlichkeiten umzuwandeln. Theoretisch sollte es jedoch kaum einen Unterschied machen, ob wir direkt mit den Scores von Bert oder mit den Wahrscheinlichkeiten arbeiten: Das einzige was sich vielleicht etwas ändern könnte ist die Verteilung unserer zu testenden Threshholds relativ zu den Scores/Wahrscheinlichkeiten. (Wir definieren diese ja in einem Bereich zwischen dem kleinsten und größten Score/Wahrscheinlichkeit). Vollständigkeitshalber haben wir es trotzdem auch ohne Softmax probiert, um zu schauen, ob es tatsächlich keinen nennenswerten Unterschied macht. Mit einem etwas abgeänderten Code bekommen wir den Output:
+Im oberen Code benutzen wir Softmax, um die Scores von BERT in Wahrscheinlichkeiten umzuwandeln. Theoretisch sollte es jedoch kaum einen Unterschied machen, ob wir direkt mit den Scores von Bert oder mit den Wahrscheinlichkeiten arbeiten: Das einzige, was sich vielleicht etwas ändern könnte, ist die Verteilung unserer zu testenden Thresholds relativ zu den Scores/Wahrscheinlichkeiten. (Wir definieren diese ja in einem Bereich zwischen dem kleinsten und größten Score/Wahrscheinlichkeit). Vollständigkeitshalber haben wir es trotzdem auch ohne Softmax probiert, um zu schauen, ob es tatsächlich keinen nennenswerten Unterschied macht. Mit einem etwas abgeänderten Code bekommen wir den Output:
 \begin{verbatim}
 Running on: cuda
 Verwendete Samples: 74644
@@ -1053,7 +1053,7 @@ Best Accuracy: 52.55%
 \end{verbatim}
 Es macht also wie erwartet kaum einen Unterschied, weshalb wir im Folgenden Kapitel die Softmax weglassen und direkt mit den Scores arbeiten.
 \\ \\
-Letztlich berechnen wir noch den F1-Score, testen den besten F1-Threshhold und plotten die ROC- und Precision-Recall Curve mit Scikit-learn:
+Letztlich berechnen wir noch den F1-Score, testen den besten F1-Threshold und plotten die ROC- und Precision-Recall Curve mit Scikit-learn:
 \begin{verbatim}
 Best Threshold (F1): -5.665081024169922
 Best F1: 0.6666845292662575
@@ -1071,7 +1071,7 @@ Accuracy at F1-threshold: 50.00%
 \end{figure}
 
 Hier sieht man schön, dass das Modell kaum besser als Raten ist. Die AUC der ROC und Precision-Recall Curve betragen beide ca. 0.53, d.h. nur minimal besser als 0.5, was Raten entspricht. \cite{ROCPRCAUC}
-Für das Cloze-test-with-Bert Datenset scheint unserer Ansatz etwas zu naiv zu sein. Unsere Vermutung ist, dass die Scores von BERT zu nah beieinander liegen, um einen guten Threshhold zu finden, da die Sätze sehr viel auf Logik basieren und BERT hier nicht so gut mit dem Satzkontext arbeiten kann: Kontextmäßig scheinen beide Antwortmöglichkeiten plausibel (in fast allen Sätzen kommen beide Antwortmöglichkeiten bereits vor der Lücke vor).  
+Für das Cloze-test-with-Bert Datenset scheint unser Ansatz etwas zu naiv zu sein. Unsere Vermutung ist, dass die Scores von BERT zu nah beieinander liegen, um einen guten Threshold zu finden, da die Sätze sehr viel auf Logik basieren und BERT hier nicht so gut mit dem Satzkontext arbeiten kann: Kontextmäßig scheinen beide Antwortmöglichkeiten plausibel (in fast allen Sätzen kommen beide Antwortmöglichkeiten bereits vor der Lücke vor).  
 \\ \\
 Im nächsten Unterkapitel versuchen wir die Korrektur auf einem etwas besser geignetem Datenset.
 %================================
@@ -1089,7 +1089,7 @@ source:  Eine eindeutige ID der Passage.
 \end{verbatim}
 
 
-Im folgenden Code laden wir 100 Passagen aus dem Validierungsset des CLOTH-Datensets. Für jede Lücke in dieser Passage setzen wir die verschiedenen Antwortmöglichkeiten ein und lassen die Scores dieser berechnen. Anschließend suchen wir wieder einen guten Threshhold, um viele richtige Vorhersagen zu bekommen.
+Im folgenden Code laden wir 100 Passagen aus dem Validierungsset des CLOTH-Datensets. Für jede Lücke in dieser Passage setzen wir die verschiedenen Antwortmöglichkeiten ein und lassen die Scores dieser berechnen. Anschließend suchen wir wieder einen guten Threshold, um viele richtige Vorhersagen zu bekommen.
 
 \begin{lstlisting}[language = python]   
 import glob
@@ -1168,9 +1168,9 @@ print(f"Verwendete Samples: {len(scores)}")
 
 best_acc = 0.0
 best_threshold = 0.0
-threshholdcount = 300
+Thresholdcount = 300
 
-for t in np.linspace(scores.min(), scores.max(), threshholdcount):
+for t in np.linspace(scores.min(), scores.max(), Thresholdcount):
     preds = scores > t
     acc = (preds == labels).mean()
     if acc > best_acc:
@@ -1178,7 +1178,7 @@ for t in np.linspace(scores.min(), scores.max(), threshholdcount):
         best_threshold = t
 
 print(f"Processed {len(all_files)} files")
-print(f"Anzahl der getesteten Thresholds: {threshholdcount}")
+print(f"Anzahl der getesteten Thresholds: {Thresholdcount}")
 print(f"Best Threshold: {best_threshold:.6f}")
 print(f"Best Accuracy: {best_acc * 100:.2f}%")
 \end{lstlisting}
@@ -1193,7 +1193,7 @@ Best Accuracy: 82.85%
 \end{verbatim}
 Man sieht, es funktioniert auf diesem Datenset deutlich besser als beim Ersten. Wenn man hier raten würde, betrage die Accuracy ca. 50\% und falls man immer auf "falsch ausgefüllt"{} tippen würde 75\% . (Da wir immer alle vier Antwortmöglichkeiten eingesetzt haben, also pro Lücke jeweils immer drei falsche und eine richtige Antwort korrigiert haben.)
 \\
-Wenn wir den Threshholdcount auf z.B. 1.000.000 setzen, verbessert sich die Accuracy nur wenig:
+Wenn wir den Thresholdcount auf z.B. 1.000.000 setzen, verbessert sich die Accuracy nur wenig:
 \begin{verbatim}
 Processed 2341 files
 Anzahl der getesteten Thresholds: 1000000
@@ -1225,7 +1225,7 @@ Accuracy at F1-threshold: 80.31%
 Processed 2341 files
 \end{verbatim}
 
-Die Accuracy unter diesem F1-Threshhold ist etwas schlechter als die beste Accuracy, die wir vorhin gefunden haben, aber immer noch besser als Raten oder alles als Falsch beurteilen. Es macht natürlich Sinn, dass die Accuracy hier etwas schlechter ausfällt, da wir den Threshhold so gewählt haben, dass der F1-Score maximiert wird und nicht die Accuracy.
+Die Accuracy unter diesem F1-Threshold ist etwas schlechter als die beste Accuracy, die wir vorhin gefunden haben, aber immer noch besser als Raten oder alles als Falsch beurteilen. Es ergibt natürlich Sinn, dass die Accuracy hier etwas schlechter ausfällt, da wir den Threshold so gewählt haben, dass der F1-Score maximiert wird und nicht die Accuracy.
 \\
 Insgesamt funktioniert unser Ansatz also auf dem CLOTH-Datenset deutlich besser als auf dem Cloze-test-with-Bert Datenset. Wenn wir einen Auschnitt einer Passage aus dem CLOTH-Datenset betrachten, sehen wir vielleicht warum:
 
@@ -1240,7 +1240,7 @@ Hier werden diese vier Wörter eingesetzt und von unserem Code "überprüft" :
     "teacher", 
     "cleaner"
 \end{verbatim}
-Hier ist es relativ klar, dass ''doctor'' die richtige Antwort ist, da ''hospital'' kurz davor im Satz als Kontext zur Verfügung steht. BERT nutzt das natürlich und wird doctor deshalb einen höheren Score geben. Natürlich haben nicht alle Sätze so offensichtlichen Kontext wie hier, und natürlich gibt es manche Lücken bei denen es stattdessen z.B. um Grammatik geht (auf denen BERT eigentlich auch ganz gut abschneiden sollte). Anscheinend gibt es aber genug solcher Lücken, sodass wir mit unserem naiven Ansatz einen relativ guten Threshhold finden können. 
+Hier ist es relativ klar, dass ''doctor'' die richtige Antwort ist, da ''hospital'' kurz davor im Satz als Kontext zur Verfügung steht. BERT nutzt das natürlich und wird doctor deshalb einen höheren Score geben. Natürlich haben nicht alle Sätze so offensichtlichen Kontext wie hier, und natürlich gibt es manche Lücken bei denen es stattdessen z.B. um Grammatik geht (auf denen BERT eigentlich auch ganz gut abschneiden sollte). Anscheinend gibt es aber genug solcher Lücken, sodass wir mit unserem naiven Ansatz einen relativ guten Threshold finden können. 
     \newpage
 %==================
 %Arbeitsaufteilung
