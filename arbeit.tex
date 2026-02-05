@@ -1070,7 +1070,10 @@ Accuracy at F1-threshold: 50.00%
     \caption{ROC Curve (a) und Precision-Recall Curve (b) auf Cloze-test-with-Bert Datenset}
 \end{figure}
 
-Hier sieht man schön, dass das Modell kaum besser als Raten ist. Die AUC der ROC und Precision-Recall Curve betragen beide ca. 0.53, d.h. nur minimal besser als 0.5, was Raten entspricht.
+Hier sieht man schön, dass das Modell kaum besser als Raten ist. Die AUC der ROC und Precision-Recall Curve betragen beide ca. 0.53, d.h. nur minimal besser als 0.5, was Raten entspricht. \cite{ROCPRCAUC}
+Für das Cloze-test-with-Bert Datenset scheint unserer Ansatz etwas zu naiv zu sein. Unsere Vermutung ist, dass die Scores von BERT zu nah beieinander liegen, um einen guten Threshhold zu finden, da die Sätze sehr viel auf Logik basieren und BERT hier nicht so gut mit dem Satzkontext arbeiten kann: Kontextmäßig scheinen beide Antwortmöglichkeiten plausibel (in fast allen Sätzen kommen beide Antwortmöglichkeiten bereits vor der Lücke vor).  
+\\ \\
+Im nächsten Unterkapitel versuchen wir die Korrektur auf einem etwas besser geignetem Datenset.
 %================================
 %5.2 Korrektur auf CLOTH Datenset
 %=================================
@@ -1209,7 +1212,8 @@ Wir können die ROC Curve und die Precision-Recall Curve wieder mithilfe von Sci
     \caption{ROC Curve (a) und Precision-Recall Curve (b) auf CLOTH Datenset}
 \end{figure}
 
-Man sieht direkt an der ROC Curve, dass das Modell besser als Raten abschneidet. Die AUC der ROC Curve beträgt ca. 0.8 und die AUC der Precision-Recall Curve ca. 0.67.
+Man sieht direkt an der ROC Curve, dass das Modell besser als Raten abschneidet. Die AUC der ROC Curve beträgt ca. 0.8 und die AUC der Precision-Recall Curve ca. 0.67. Raten würde hier eine ROC AUC von ca. 0.5 und eine Precision-Recall AUC von ca. 0.25 liefern. Da die Precision-Recall AUC bei zufälligem Classifier dem Anteil der positiven Samples entspricht, also hier ca. 25\% (da wir ja immer drei falsche und eine richtige Antwort pro Lücke haben). \cite{ROCPRCAUC}
+\\
 Bezüglich des F1-Scores bekommen wir hier folgenden besten Threshold und die dazugehörigen Werte:
 
 \begin{verbatim}
@@ -1221,9 +1225,23 @@ Accuracy at F1-threshold: 80.31%
 Processed 2341 files
 \end{verbatim}
 
-Die Accuracy unter diesem F1-Threshhold ist etwas schlechter als die beste Accuracy, die wir vorhin gefunden haben, aber immer noch besser als Raten oder alles als Falsch beurteilen. 
+Die Accuracy unter diesem F1-Threshhold ist etwas schlechter als die beste Accuracy, die wir vorhin gefunden haben, aber immer noch besser als Raten oder alles als Falsch beurteilen. Es macht natürlich Sinn, dass die Accuracy hier etwas schlechter ausfällt, da wir den Threshhold so gewählt haben, dass der F1-Score maximiert wird und nicht die Accuracy.
+\\
+Insgesamt funktioniert unser Ansatz also auf dem CLOTH-Datenset deutlich besser als auf dem Cloze-test-with-Bert Datenset. Wenn wir einen Auschnitt einer Passage aus dem CLOTH-Datenset betrachten, sehen wir vielleicht warum:
 
-\newpage
+\begin{verbatim}
+    "Mr Black works in a hospital . As a good  _  , the people in the town like him. ..."
+\end{verbatim}
+
+Hier werden diese vier Wörter eingesetzt und von unserem Code "überprüft" : 
+\begin{verbatim}
+    "doctor", 
+    "farmer", 
+    "teacher", 
+    "cleaner"
+\end{verbatim}
+Hier ist es relativ klar, dass ''doctor'' die richtige Antwort ist, da ''hospital'' kurz davor im Satz als Kontext zur Verfügung steht. BERT nutzt das natürlich und wird doctor deshalb einen höheren Score geben. Natürlich haben nicht alle Sätze so offensichtlichen Kontext wie hier, und natürlich gibt es manche Lücken bei denen es stattdessen z.B. um Grammatik geht (auf denen BERT eigentlich auch ganz gut abschneiden sollte). Anscheinend gibt es aber genug solcher Lücken, sodass wir mit unserem naiven Ansatz einen relativ guten Threshhold finden können. 
+    \newpage
 %==================
 %Arbeitsaufteilung
 %==================
