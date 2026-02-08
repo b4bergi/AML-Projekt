@@ -1,46 +1,56 @@
 This is BibTeX, Version 0.99d (TeX Live 2023)
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: arbeit.aux
-The style file: plain.bst
+The style file: IEEEtran.bst
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
 Database file #1: references.bib
-You've used 8 entries,
-            2118 wiz_defined-function locations,
-            540 strings with 5192 characters,
-and the built_in function-call counts, 2009 in all, are:
-= -- 185
-> -- 110
+-- IEEEtran.bst version 1.14 (2015/08/26) by Michael Shell.
+-- http://www.michaelshell.org/tex/ieeetran/bibtex/
+-- See the "IEEEtran_bst_HOWTO.pdf" manual for usage information.
+
+Done.
+You've used 9 entries,
+            4087 wiz_defined-function locations,
+            869 strings with 8628 characters,
+and the built_in function-call counts, 3693 in all, are:
+= -- 269
+> -- 80
 < -- 0
-+ -- 45
-- -- 36
-* -- 94
-:= -- 362
-add.period$ -- 27
-call.type$ -- 8
-change.case$ -- 40
++ -- 38
+- -- 19
+* -- 145
+:= -- 645
+add.period$ -- 16
+call.type$ -- 9
+change.case$ -- 12
 chr.to.int$ -- 0
-cite$ -- 8
-duplicate$ -- 65
-empty$ -- 162
-format.name$ -- 36
-if$ -- 413
+cite$ -- 9
+duplicate$ -- 306
+empty$ -- 343
+format.name$ -- 23
+if$ -- 804
 int.to.chr$ -- 0
-int.to.str$ -- 8
-missing$ -- 3
-newline$ -- 46
-num.names$ -- 16
-pop$ -- 74
+int.to.str$ -- 9
+missing$ -- 76
+newline$ -- 56
+num.names$ -- 9
+pop$ -- 227
 preamble$ -- 1
-purify$ -- 34
-quote$ -- 0
-skip$ -- 47
+purify$ -- 0
+quote$ -- 2
+skip$ -- 275
 stack$ -- 0
-substring$ -- 41
-swap$ -- 8
+substring$ -- 17
+swap$ -- 172
 text.length$ -- 0
 text.prefix$ -- 0
-top$ -- 0
-type$ -- 32
+top$ -- 5
+type$ -- 9
 warning$ -- 0
-while$ -- 16
-width$ -- 9
-write$ -- 83
+while$ -- 9
+width$ -- 10
+write$ -- 98

@@ -472,7 +472,7 @@ df
 \end{figure}
 \noindent
 Die Daten können ausgewertet werden, 
-in dem man betrachtet, wie viele der zehn Sätze BERT richtig beantwortet hat.
+indem man betrachtet, wie viele der zehn Sätze BERT richtig beantwortet hat.
 Zusätzlich wurde auch untersucht, ob die richtige Antworte in den Top 5 vorhergesagten Antworten vorkommt.
 
 \begin{lstlisting}[language=python]
@@ -490,7 +490,7 @@ print(f"Top-5 Accuracy: {top5}/{total}")
 # Top-5 Accuracy: 6/10
 \end{lstlisting}
 \noindent\\
-Dieses Vorgehen wurde dann mit verschieden Modellen und mit, 
+Dieses Vorgehen wurde dann mit verschiedenen Modellen und mit, 
 nach verschiedenen Themengebieten gruppierten, Sätzen wiederholt.
 
 \subsubsection{Ergebnisse}
@@ -518,10 +518,10 @@ Human     & 10/10 & 10/10 & 10/10 & 10/10 & 7/10 & 7/10 & 10/10 & 10/10 & 10/10 
 \vspace{1em}
 \noindent\\
 Die Ergebnisse in der Tabelle zeigen deutliche Leistungsunterschiede zwischen den getesteten Modellen sowie zwischen den verschiedenen Textarten.
-Insgesamt schneiden alle Modelle bei kurzen, englischen Texten - insbesondere bei Wikipedia-Artikeln und Kinderbüchersitzen- deutlich besser ab als bei längeren Texten oder bei deutschsprachigen Inhalten. 
+Insgesamt schneiden alle Modelle bei kurzen, englischen Texten, insbesondere bei Wikipedia-Artikeln und Sätze aus Kinderbüchern- deutlich besser ab als bei längeren Texten oder bei deutschsprachigen Inhalten. 
 Dies deutet darauf hin, dass sowohl Textstruktur als auch Sprachraum einen starken Einfluss auf die Vorhersagequalität haben. 
 RoBERT und MPNet erzielen in mehreren Kategorien die besten Ergebnisse, insbesondere bei englischen Texten.
-Dies lässt sich von allem durch ihre größere und diversere Trainingsdaten sowie durch optimierte Trainingsstrategien erklären. 
+Dies lässt sich vor allem durch ihre größere und diversere Trainingsdaten sowie durch optimierte Trainingsstrategien erklären. 
 BERT zeigt insgesamt stabile, aber meist etwas schwächere Leistungen, während ALBERT in fast allen Szenarien deutlich hinter den anderen Modellen zurückbleibt, was vermutlich auf seine stärkere komprimierte Modellarchitektur zurückzuführen ist. 
 Ein besonders auffälliges Ergebnis ist die sehr schwache Performance der meisten Modelle auf deutschen Texten. 
 Ursache hierfür sind unter anderem die komplexe Morphologie des Deutschen, häufige Komposita sowie Tokenisierungsprobleme, die dazu führen, dass viele Wörter nicht als einzelne sinnvolle Einheiten verarbeitet werden können.
@@ -1264,9 +1264,12 @@ Hier ist es relativ klar, dass ''doctor'' die richtige Antwort ist, da ''hospita
 \caption{Arbeitsaufteilung im Projekt und Protokoll}
 \end{table}
 
+\section*{Disclaimer}
+Teile des Codes wurden mit Unterstützung von KI-Tools erstellt. 
+Der generierte Code wurde überprüft, getestet und angepasst.
 
 \bibliographystyle{IEEEtran}
-\bibliography{references.bib}
+\bibliography{references}
 
 
 \end{document}
